@@ -1,19 +1,18 @@
 # Tools to know in AWS (Console Home) 
-
--+ EC2 (Elastic Compute Cloud)
-VPC (Virtual Private Cloud)
-S3
-Route 53
-System Manager
-IAM
-Elastic Kubernetes services
-Certificate Manager
-Secret manager
-Elastic Container Registry
-EC2 Dashboard
-Elastic IPs
-Load Balancers
-Snapshots
+- EC2 (Elastic Compute Cloud)
+- VPC (Virtual Private Cloud)
+- S3
+- Route 53
+- System Manager
+- IAM
+- Elastic Kubernetes services
+- Certificate Manager
+- Secret manager
+- Elastic Container Registry
+- EC2 Dashboard
+- Elastic IPs
+- Load Balancers
+- Snapshots
 
 ## Auto Scaling Groups 
 When server usage increases, and causes a server overload, which causes a need to launch more servers.
