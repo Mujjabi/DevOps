@@ -1,6 +1,6 @@
 # Tools to know in AWS (Console Home) 
 
-EC2 (Elastic Compute Cloud)
+-+ EC2 (Elastic Compute Cloud)
 VPC (Virtual Private Cloud)
 S3
 Route 53
