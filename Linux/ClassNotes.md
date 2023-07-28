@@ -8,7 +8,8 @@ To identify who you are or identify which server you are connected to. You can u
 - pwd: where am i? or present working directory
 - ls : list the folders in my current directory
 - cd : change directory or move from one directory to another. To use cd, you need to know where you are going 
-``` cd s6christopher
+```
+cd s6christopher
 #this take you from where ever you are to the s6christopher folder
 ```
 - mkdir: create a folder or directory 
