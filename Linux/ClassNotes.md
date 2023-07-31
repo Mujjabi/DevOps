@@ -1103,3 +1103,14 @@ sed 's/hello/world/g' example.txt
 ```
 This means replace the word hello with world in the example.txt file
 
+## Checking and Changing timezone of the server
+Sometimes your server is set to a different timezone from the one you are currently located.
+This sometimes complicated scheduling operations if your machine is in a different time zone. Forexample, if I want crontab to shutdown my machine and server
+at a specific time, say 10 o'clock central time, it will be a different time in the westcoast. Therefore, you have to snycronize your machine with your local time using the command below
+```
+date    #this check the date and time of your machine. If this doesnt match your time zone, use the command below.
+timedatectl    #this shows the current time zone setting of your machine. If this doesnt match your zone, use this command to syncronize it.
+sudo timedatectl set-timezone America/Chicago   #this changes it to central time (Chicago)
+timedatectl  #this checks to comfirm that the zone has changed to your desired zone.
+```
+
