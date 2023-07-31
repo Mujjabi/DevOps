@@ -1132,4 +1132,4 @@ timedatectl  #this checks to comfirm that the zone has changed to your desired z
   Time zone: America/Chicago (CDT, -0500)
   System clock synchronized: yes
 ```
-
+I can also add things now. 
