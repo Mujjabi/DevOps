@@ -1109,8 +1109,27 @@ This sometimes complicated scheduling operations if your machine is in a differe
 at a specific time, say 10 o'clock central time, it will be a different time in the westcoast. Therefore, you have to snycronize your machine with your local time using the command below
 ```
 date    #this check the date and time of your machine. If this doesnt match your time zone, use the command below.
-timedatectl    #this shows the current time zone setting of your machine. If this doesnt match your zone, use this command to syncronize it.
+timedatectl    #this shows the current time zone setting of your machine.
+
+root@ip-172-31-82-245:~# timedatectl
+               Local time: Mon 2023-07-31 19:54:27 UTC
+           Universal time: Mon 2023-07-31 19:54:27 UTC
+                 RTC time: Mon 2023-07-31 19:54:27
+                Time zone: Etc/UTC (UTC, +0000)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+```
+If this doesnt match your zone, use this command to syncronize it
+
+```
 sudo timedatectl set-timezone America/Chicago   #this changes it to central time (Chicago)
+
 timedatectl  #this checks to comfirm that the zone has changed to your desired zone.
+ Local time: Thu 2023-05-25 07:30:45 CDT
+  Universal time: Thu 2023-05-25 12:30:45 UTC
+  RTC time: Thu 2023-05-25 12:30:45
+  Time zone: America/Chicago (CDT, -0500)
+  System clock synchronized: yes
 ```
 
