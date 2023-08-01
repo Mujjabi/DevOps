@@ -8,7 +8,7 @@ Version control, also known as source control, is the practice of tracking and m
 
 A version control system records changes to files stored in the system. These files can be source code, assets, or other documents that might be part of a software development project. Teams make changes in groups called commits or revisions
 
-Control System VCS allows you to:
+## Control System VCS allows you to:
 - Revert the code files back to their previous state
 - Recall and revert the entire project back to its previous state
 - Compare code changes over specific durations of time
@@ -71,7 +71,7 @@ password: "paste token"
 ```
 This is not used anymore because you have to use the token everytime you need access to the remote repository. instead we use the ssh key authentication. 
 
-Generating SSH on your local machine for authentication
+## Generating SSH on your local machine for authentication
 ```
 ssh-keygen
 Generating public/private rsa keypara
