@@ -151,6 +151,27 @@ git revert "commit Id"
 ```
 git status
 ```
+## Creating branches from the main branch
+```
+git branch  #this shows you your current branch
+git branch -a # this shows you all the branches you have
+git checkout main  #this moved you to the main branch. this is like cd in linux
+git branch submaster #this creates a branch called submaster from the main branch. 
+```
+If we create a folder under the submaster branch, it is only in this branch not on the main until it is merged to the main
+
+## creating a branch and moving to that branch in one code
+```
+git checkout -b branchname
+
+git checkout -b superbranch
+#this creates a superbranch and moves you to this branch.
+```
+You can use git switch to do the same function
+```
+git switch -b submaster
+```
+
 
 
 
