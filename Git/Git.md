@@ -175,7 +175,7 @@ git switch -b submaster
 This process enables us to protect the main branch from any errors and bugs from other contributors. We carefully review any content they commit from their branches before we merge it into the main branch.
 Therefore, we have to make a pull request to their branch in order to review their content before merging with the main branch. 
 
-This also helps to ressolve a merge conflict. This happens when 2 people are modifying the same thing at the same time.
+This also helps to resolve a merge conflict. This happens when 2 people are modifying the same thing at the same time. This happens when you are working in the same branch
 
 
 
