@@ -196,7 +196,5 @@ manuscripts
 /manuscripts/drafts/thesis.doc    #for a specific file, you have to put the path to the file 
 ```
 
-
-
-
+## Readme File
 
