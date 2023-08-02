@@ -186,7 +186,15 @@ mkdir .github
 touch Pull_Request_Template.md
 vim Pull_Request_Template.md
 ```
-
+## Gitignore file
+In this file, you add all the files or directories that you dont want git to track. When you do git commits and push, the changes in the files or directories listed in the gitignore will not be tracked.
+```
+gitignore file
+##List all the folders or files that you dont want git to track
+Data  
+manuscripts
+/manuscripts/drafts/thesis.doc    #for a specific file, you have to put the path to the file 
+```
 
 
 
