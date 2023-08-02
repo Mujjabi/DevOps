@@ -12,9 +12,10 @@
 - [ ] Created feature branch
 - [ ] Modified feature in the main branch 
 
-4. Provide your contact information 
+4. Provide your contact information
+   > 
 
-## Add any other details here. 
+6. Add any other details here. 
 >
 
 
