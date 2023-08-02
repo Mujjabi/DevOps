@@ -177,9 +177,15 @@ Therefore, we have to make a pull request to their branch in order to review the
 
 This also helps to resolve a merge conflict. This happens when 2 people are modifying the same thing at the same time. This happens when you are working in the same branch
 
+## Pull Request Template
+This is a document/form that other collaborators have to fill in before merging their branch to the main branch. When they submit a pull request to the reviewer, they have to explain what exactly they were doing. 
 
-
-
+You have to create a directory called .github inside the repository, and inside this directory, you create a rmarkdown file with the diffeent questions you want other people to answer when they do a pull request
+```
+mkdir .github
+touch Pull_Request_Template.md
+vim Pull_Request_Template.md
+```
 
 
 
