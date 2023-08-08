@@ -14,6 +14,9 @@
 - Load Balancers
 - Snapshots
 
+## Elastic IPs
+This is set up so that when you stop your EC2 instance, it doesnt generate a different IP when you restart it again next time
+
 ## Auto Scaling Groups 
 When server usage increases, and causes a server overload, which causes a need to launch more servers.
 For example, on Black Friday, when prices go down, more people shop, causing a crush on the server. Instead of buying more servers, they automatically lunches other instances to manage the traffic, and when it goes below a certain level, the instances shut down automatically. (On-demand instances, only launched when needed).  Instead of adding servers (idle servers) in the data center, aws lunches instances when needed.  
