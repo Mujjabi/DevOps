@@ -248,6 +248,12 @@ DO NOT USE YOUR PERSONAL EMAIL to create this account.
 ![image](https://github.com/Mujjabi/DevOps/assets/60195025/75c9d91b-8e82-41d7-83b1-f1af551966c3)
 
 
+## Branck Protection
+Branch protections is needed to protect the branch so that no one can merge content to the main branch without creating a pull request and seeking approval. 
+To add this feature to your github, you might have to upgrade to a different github account that you have to pay for. 
+Go to branch protection and add a list of branches that you want to protect. Everytime someone wants to modify the branch, they need to submit a pull request. 
+
+This setting is under settings of a specific repository. 
 
 
 
