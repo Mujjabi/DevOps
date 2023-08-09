@@ -220,11 +220,13 @@ You can create tables using the pipe (|) as the column separate and (-) to creat
 |keyboard|1    |300         |Bought       |
 
 ## Code Block
-1. using the ` key.
-To paste a simple code block, you can use three (`) S
+1. using the (`) key. 
+- To paste a simple code block, you can use three (`) S
+- This key can also be used to highlight a text or paragraph. Just put it at the begining of that paragraph like this. `Hey my friends`
    
 2.  Code block with the syntax of the language
-You still using the three 
+- You still add a code block using the same three symbols, however, at the end, you need to add the naming of the specific langauge below the closing (`). Forexample add .yaml to a docker file. 
+
 #### Adding Link
 To add a link you open the ([) to add the message like click here and then use the brackets to add the link. Forexample [Here](https://github.com/Mujjabi) is the link to my github account. Remember to not put space between the closing ] and the opening (, otherwise it will look like this [Here] (https://github.com/Mujjabi). 
 
