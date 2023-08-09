@@ -189,12 +189,70 @@ vim Pull_Request_Template.md
 ## Gitignore file
 In this file, you add all the files or directories that you dont want git to track. When you do git commits and push, the changes in the files or directories listed in the gitignore will not be tracked.
 ```
-gitignore file
+touch .gitignore  #Added gitignore file
 ##List all the folders or files that you dont want git to track
 Data  
 manuscripts
 /manuscripts/drafts/thesis.doc    #for a specific file, you have to put the path to the file 
 ```
+Git will stop tracking files Data and manuscripts 
+
+
+
+
+
 
 ## Readme File
+This is a markdown file that is used as a log of every change made in a repository.
+The # controls the font size depending on what you want
+#### Bold and italic
+The * can either make words bold or italic. if its one it makes it italic and if its 2 it makes it bold. forexample here, this *word* is italic while this **word** is bold. 
+
+You can create lists, create tables, etc 
+#### Tables with rows and columns
+You can create tables using the pipe (|) as the column separate and (-) to create line to make header. See below.
+
+|Item   | Unit | Price (UsD) | Status    |
+|-------|------|------------|-------------|
+|keyboard|1    |300         |  Bought     |
+|keyboard|1    |300         |Bought       |
+|keyboard|1    |300         |Bought       |
+|keyboard|1    |300         |Bought       |
+
+## Code Block
+1. using the ` key.
+To paste a simple code block, you can use three (`) S
+   
+2.  Code block with the syntax of the language
+You still using the three 
+#### Adding Link
+To add a link you open the ([) to add the message like click here and then use the brackets to add the link. Forexample [Here](https://github.com/Mujjabi) is the link to my github account. Remember to not put space between the closing ] and the opening (, otherwise it will look like this [Here] (https://github.com/Mujjabi). 
+
+#### Adding Images
+To add images to the markdown file, 
+- Create a folder called images and load all the Images you want to display or put in readme file.
+- name your images
+- Use a syntax below to display images
+  ```
+  ![](/absolute path of the image)
+  ![](/folder_images/image1.jpg)
+  ```
+## Organization account creation
+This is when a company creates an organizational account that contains all the repositories of that company. People within the company can be added to specific repositories 
+and they can collaborate within that repository. 
+You create a github account using th company email and the company sends you an invitation to join the company organizational account and repositories. 
+DO NOT USE YOUR PERSONAL EMAIL to create this account. 
+
+![image](https://github.com/Mujjabi/DevOps/assets/60195025/75c9d91b-8e82-41d7-83b1-f1af551966c3)
+
+
+
+
+
+
+
+
+
+
+
 
