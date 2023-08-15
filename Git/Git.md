@@ -155,7 +155,7 @@ git status
 ```
 git branch  #this shows you your current branch
 git branch -a # this shows you all the branches you have
-git checkout main  #this moved you to the main branch. this is like cd in linux
+git checkout main  #this moves you to the main branch. this is like cd in linux
 git branch submaster #this creates a branch called submaster from the main branch. 
 ```
 If we create a folder under the submaster branch, it is only in this branch not on the main until it is merged to the main
@@ -255,9 +255,54 @@ Go to branch protection and add a list of branches that you want to protect. Eve
 
 This setting is under settings of a specific repository. 
 
+## Git restore
+This restore changes locally. This is only used when you havent commited from the working directory to the local repository. 
+These changes are saved but not staged or commited already. 
+```
+git restore *
 
+```
+## Git reset 
+There main moded that git reset can do these include : 
+- **Mixed reset:** removes commits but reserves changes in the working directory. This is the default option. This basically undoes the commit but saves changes u have been working with.
+  
+- **Soft reset:**  Removes commits and brings back to the staging area. This is used if u want to make one commit for all changes made. Therefore if made commits already, then make more changes thta need to be committed,you can undo the innitial commits, make the change and make a new commit with all changes before u push.
+  
+- **Hard reset:** Wipe out changes from working directory and the staging area.All changes disappear everywhere and cant be recovered, BE VERY CAREFUL WITH THIS UNDO COMMAND
+These are used in this form
+```
+$ git log --oneline
+01da54f (HEAD -> main, origin/main, origin/HEAD) Testing gitignore
+c88c3a7 test
+8f16022 gitignore test
+ee2fd56 Created a gitignore file and added list of files. modified git.md
+2f64e23 Adding links and code blocks
+38d9384 Added how to edit readme file
+git reset --mixed ee2fd56
+```
 
+## Git revert 
+This reverts commits that were pushed to public repositories. 
+Forexample, All the changes have been pushed and jenkin used them to build the code and make changes to the website. if the customer complains and want the old version of the website, you can use git revert to undo changes pushed to the public. 
+```
+git log --oneline
 
+01da54f (HEAD -> main, origin/main, origin/HEAD) Testing gitignore
+c88c3a7 test
+8f16022 gitignore test
+ee2fd56 Created a gitignore file and added list of files. modified git.md
+2f64e23 Adding links and code block
+#we want to recover the first push when we added the links and code block.
+
+git revert 2f64e23
+```
+
+## Merge Conflict
+
+This happens when 2 people are working on the same line or block or code at the same time. 
+When one of them try to push there changes, this creates a merge conflict because git is not sure what changes to save hence creating a merge conflict.
+In this case, the 2 people have to talk and decide which changes to commit, and delete the other changes. 
+Here is when we use the pull request to compare the versions and make the changes necessary. 
 
 
 
