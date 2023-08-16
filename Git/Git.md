@@ -155,7 +155,7 @@ git status
 ```
 git branch  #this shows you your current branch
 git branch -a # this shows you all the branches you have
-git checkout main  #this moved you to the main branch. this is like cd in linux
+git checkout main  #this moves you to the main branch. this is like cd in linux
 git branch submaster #this creates a branch called submaster from the main branch. 
 ```
 If we create a folder under the submaster branch, it is only in this branch not on the main until it is merged to the main
@@ -252,7 +252,153 @@ Go to branch protection and add a list of branches that you want to protect. Eve
 
 This setting is under settings of a specific repository. 
 
+## Git restore
+This restore changes locally. This is only used when you havent commited from the working directory to the local repository. 
+These changes are saved but not staged or commited already. 
+```
+git restore *
 
+```
+## Git reset 
+There main moded that git reset can do these include : 
+- **Mixed reset:** removes commits but reserves changes in the working directory. This is the default option. This basically undoes the commit but saves changes u have been working with.
+  
+- **Soft reset:**  Removes commits and brings back to the staging area. This is used if u want to make one commit for all changes made. Therefore if made commits already, then make more changes thta need to be committed,you can undo the innitial commits, make the change and make a new commit with all changes before u push.
+  
+- **Hard reset:** Wipe out changes from working directory and the staging area.All changes disappear everywhere and cant be recovered, BE VERY CAREFUL WITH THIS UNDO COMMAND
+These are used in this form
+```
+$ git log --oneline
+01da54f (HEAD -> main, origin/main, origin/HEAD) Testing gitignore
+c88c3a7 test
+8f16022 gitignore test
+ee2fd56 Created a gitignore file and added list of files. modified git.md
+2f64e23 Adding links and code blocks
+38d9384 Added how to edit readme file
+git reset --mixed ee2fd56
+```
+
+## Git revert 
+This reverts commits that were pushed to public repositories. 
+Forexample, All the changes have been pushed and jenkin used them to build the code and make changes to the website. if the customer complains and want the old version of the website, you can use git revert to undo changes pushed to the public. 
+```
+git log --oneline
+
+01da54f (HEAD -> main, origin/main, origin/HEAD) Testing gitignore
+c88c3a7 test
+8f16022 gitignore test
+ee2fd56 Created a gitignore file and added list of files. modified git.md
+2f64e23 Adding links and code block
+#we want to recover the first push when we added the links and code block.
+
+git revert 2f64e23
+```
+
+## Merge Conflict
+
+This happens when two people are working on the same line or block or code at the same time. 
+When one of them tries to push their changes, this creates a merge conflict because git is not sure what changes to save hence creating a merge conflict.
+In this case, the 2 people have to talk and decide which changes to commit and delete the other changes. 
+Here is when we use the pull request to compare the versions and make the changes necessary. 
+
+
+## A Git Tag
+In git, a tag is a reference or label that is assigned to a specific commit in the repository history. it is a way to mark important points in the development timeline, such as a major release, milestones or significant changes in the software development. 
+For example, the release of a program, there are major released that are tagged with the version release name such as **v1.5.0, v1.6.0, v1.7.0** etc. 
+
+Every tag also has a document or note called a **Release note**, that contains all infomation about the released version or the tag. 
+To create a tag with the version name, use the code below
+```
+git tag v1.0.0
+
+git push --tag
+```
+This will take a snapshot of the project at that particular point of time. This will zip up the project will all the content at that particular tag. 
+
+## Creating a Release and release note
+This is done from github, after creating the tag, you can create a release from that tag, 
+
+
+## Creating a branch at a particular commit
+```
+git checkout -b feature branch commit id or hash
+
+# for example, creating a brach here.
+$ git log  #this displays all commits
+
+commit fc6c38d49f3995c831008274c0e93b9a066624ab (HEAD -> s6christopher, origin/s6christopher)
+Author: Chris_VSCode <mujjabi2@illinois.edu>
+Date:   Tue Aug 15 19:56:55 2023 -0500
+
+    Ready for 6 figure paycheck
+
+commit 7da06705d68c2cd0138e9dfb0666e076e5961e99 (origin/s7michael, origin/s6tom, origin/s6tia, origin/s6rostaing, origin/s6romeo, origin/s6raoul1, origin/s6ola, origin/s6nic, origin/s6mannars, origin/s6lynda, origin/s6laurent, origin/s6hina, origin/s6dolapo, origin/s6delphine, origin/s6colince, origin/s6colagene, origin/s6arsene, origin/s6Arnauld, origin/main, origin/S6IDRIS, origin/HEAD, main) 
+Author: tia12 <58248085+tia12@users.noreply.github.com>
+Date:   Tue Aug 15 19:41:09 2023 -0500
+
+    Initial commit
+```
+Select the particular commit that you want to use to create a brach. Forexample, i want to creat a brach at commit made by Chris_Vscode
+
+```
+git checkout -b V1.00 fc6c38d49f3995c831008274c0e93b9a066624ab
+git tag V1.00
+git push -u branch_name tag_name
+
+git push -u main v1.00
+```
+## Creating a branch from a specific Tag
+```
+git checkout -b branch-name tag id
+#For example, creating a branch from our initial tag v1.0.0.2
+
+git checkout -b version2 v1.0.0.2
+git push
+```
+## Git Cherry-Pick
+The cherry pick is used when collaborating with someone else, and you would like to extract some work from their branch that are not merged to main. This way, no need to merge to the main, one can just get the information directly from the branch of their interest. The other collaborator needs to send you the lasted commit or the commit of the version of their work that you need to pull to your branch. 
+Even though you git pull, the branches are extracted to my local machine but the content is still in the individual branches, in order to grab content from a particular branch, you can use the cherry pick as shown below
+
+```
+git checkout collaborator-branch
+git log --oneline
+#copy the id of the commit hash of your interest
+
+git checkout yourbranch
+git cherry-pick copied-commit hash
+
+$ git checkout s6hina
+Switched to branch 's6hina'
+Your branch is up to date with 'origin/s6hina'.
+
+mujjabi2@CPSC-P10R16242 MINGW64 ~/Remote_Repositories/DEL_ORG_Repo/final-s6 (s6hina)
+$ git log --oneline
+934a124 (HEAD -> s6hina, origin/s6hina) added pull_request_template.md
+6b4ea71 edit readme file
+de38b26 added hina file
+
+mujjabi2@CPSC-P10R16242 MINGW64 ~/Remote_Repositories/DEL_ORG_Repo/final-s6 (s6hina)
+$ git checkout s6christopher 
+Switched to branch 's6christopher'
+Your branch is up to date with 'origin/s6christopher'.
+
+mujjabi2@CPSC-P10R16242 MINGW64 ~/Remote_Repositories/DEL_ORG_Repo/final-s6 (s6christopher)
+$ git cherry-pick 934a124
+
+[s6christopher 7373d3a] added pull_request_template.md
+ Author: hina ahmed <hinaahmed@devops.com>
+ Date: Tue Aug 15 20:00:39 2023 -0500
+ 1 file changed, 19 insertions(+)
+ create mode 100644 pull_request_template.md
+
+```
+
+
+## Code Freeze
+This is when no more changes are allowed to the codespace, and focus is put on stabilizing the current work. 
+
+
+## 
 
 
 
