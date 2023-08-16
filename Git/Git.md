@@ -199,9 +199,6 @@ Git will stop tracking files Data and manuscripts
 
 
 
-
-
-
 ## Readme File
 This is a markdown file that is used as a log of every change made in a repository.
 The # controls the font size depending on what you want

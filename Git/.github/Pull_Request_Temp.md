@@ -1,16 +1,23 @@
 # Pull Request Form
+# Description of the change
+> Detailed description here
 
-## Please answer the following questions before submitting your pull request.
+## Checks and balances
+- [ ] Tests added and run
+- [ ] (External) Interfaces documented
+- [ ] Has security implications (describe below)
 
-1. Describe the changes you have made.
+## Type of change
+- [ ] Bug fix (non-breaking change that fixes an issue)
+- [ ] New feature (non-breaking change that adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing
+functionality to not work as expected)
 
-2. What branch are you working on?
+## Related stories, issues and pulls
+> Links to Pivotal Tracker stories, JIRA tickets or other pull requests here
 
-3. Mark the options that apply to your situation 
-
-- [ ] Bug fix 
-- [ ] Created feature branch
-- [ ] Modified feature in the main branch 
+## Security considerations
+> Describe any security impact this change may have
 
 4. Provide your contact information
    > 
