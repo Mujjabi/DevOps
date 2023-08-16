@@ -1,4 +1,5 @@
 # Git and GitHub - Version Control System
+## Taught by Tia Leonard
 
 Version control system is very important in DevOps. Helps to track changes made during project development and keep a version of each stage of the project. 
 
