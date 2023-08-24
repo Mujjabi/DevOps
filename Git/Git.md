@@ -198,6 +198,16 @@ manuscripts
 ```
 Git will stop tracking files Data and manuscripts 
 
+However, sometimes if the file or directory was already tracked by git, adding it to gitignore file wont stop git to track it. You therefore have to remove cache to allow git to stop tracking the file. You need to run the line of code below
+```
+git rm -r --cached <File name or folder/> 
+
+git rm -r --cached git.md
+
+git rm -r --cached docker/
+
+```
+This helps to clear cache so that the intially tracked file gets untracked. If you dont run this comman, even if you add the name of the file to gitignore, it will still be tracked.
 
 
 ## Readme File
