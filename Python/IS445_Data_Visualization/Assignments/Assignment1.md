@@ -1,6 +1,6 @@
 IS 445 - ACG/ACU: Data Visualization - Fall 2023
 ===============================================
-Visualization Report 1
+Assingment 1
 -----------------------
 Student: Christopher Mujjabi
 ----------------------------
@@ -40,9 +40,13 @@ The visualization was presented using a line graph, which, in my opinion is the 
 
 ![Alt text](<WhatsApp Image 2023-08-28 at 22.03.38.jpg>)
 
-I recreated the visualization by hand, and tried to present a similar phenomenon. My visualization presents the trend of wildfires for the past 2 years in different countries. The visualization shows that Canada has had an exponential increase in wildfires in 2023 compared to other countries where wildfires are common. It was easy to 
+I recreated the visualization by hand, and tried to present a similar phenomenon. My visualization presents the trend of wildfires for the past 2 years in different countries. The visualization shows that Canada has had an exponential increase in wildfires in 2023 compared to other countries where wildfires are common. It was easy to reconstruct the image but hard to redraw the exact increments with high accuracy. However, the general trend or pattern showing an increase from 2021 to 2023 was easy to reconstruct by hand. 
 
 
 ## Visualization 3
 
+![Alt text](image-2.png)
+
+
+![Alt text](<WhatsApp Image 2023-08-28 at 23.05.40.jpg>)
 
