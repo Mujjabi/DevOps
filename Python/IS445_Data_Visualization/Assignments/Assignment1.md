@@ -22,7 +22,7 @@ Student: Christopher Mujjabi
 
 
 ## Visualization 1
-The image below was obtained from a newspaper called the Des Moines Register, reporting the NBC News Iowa caucus polls cast by 406 "likely 2024 Republican caucusgoers between August 13th to 17th.  
+The visualization below was obtained from a newspaper called the Des Moines Register, reporting the NBC News Iowa caucus polls cast by 406 "likely 2024 Republican caucusgoers between August 13th to 17th.  
 
 ![Alt text](image.png)
 
@@ -44,9 +44,14 @@ I recreated the visualization by hand and tried to present a similar phenomenon.
 
 
 ## Visualization 3
+The visualization below was obtained from a blog created by a Toan Hoang, who creates tutorials about data viz in Tableau, and most importantly, a soccer fan. I was interested in this particular visualization becuase I too am a soccer fan and support liverpool in the english premier league. 
+The visualization summaries the perfomance of Liverpool during the 2020 - 2021 premier league season and displays the goals scored and goals conceded in every single match of the season. The green ball on the outside represent the goals scored while the red balls in the inside represent the goals conceded.
 
 ![Alt text](image-2.png)
 
+The data presented is quantitative and was obatained from adding up the total number of goals scored and total number goals conceded by Liverpool for each one of the 38 games played during the 2020-2021 season. The data was not processed since the circles represent the raw data (goals scored in a particular match). The data was presented in a circle dot chart, which for this particular sport, would be ideal to present raw data given that there are fewer chances of scoring or conceding huge number of goals in a single match. This chart therefore can not be used for certain sports such as football, where the points obtained in a single game can not easily be presented as circles dots.
 
+
+I replicated the image by hand as shown below, but found it difficult to mantain the shape and size of each soccer ball that represents the goals scored or conceded. 
 ![Alt text](<WhatsApp Image 2023-08-28 at 23.05.40.jpg>)
 
