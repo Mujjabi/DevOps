@@ -69,5 +69,42 @@ docker tag old-image-name new-image-name : Rename image from the old name to a n
 Docker inspect "image name" : to inspect and get information about the image. 
 
 
+## Repositories and Images
+ubuntu is just a repository were we have individuals ubuntu images as listed below. Ubuntu is the family with multiple images
+  - ubuntu:18.04
+  - ubuntu:20.20
+  - ubuntu:16.04
+  - ubuntu:latest or ubuntu
+If we dont have the name of the image, this means that we are using the latest image of ubuntu. This can be nginx, debian, centos, redhat, etc. 
 
 
+## Official and None-official Image
+Unofficial has not been verified and certified by docker. Forexample ubuntu is certified by docker, but developeasylearning is not certified. Therefore, the presentation of the images differe based on if the image is certified or no. ubuntu:08.04 is a certified image but devopeasylearning.s5ramces:latest is not certified image. This is identified by the slash / in the image name/ 
+
+For nonofficial image, you have the account name before the slash (devopeasylearning), the repository name after the slash(s5ramces) and image name after the : (latest).
+
+### Exercise
+1- pull the  image called "postgres:14"
+
+2- tag that image to devopseasylearning/[ENTER YOUR PREFER NAME HERE]: [ENTER A TAG NAME HERE]
+
+3- login to docker using the command 
+     docker login 
+         * the username is devopseasylearning
+         * the password is DevOps2021@
+
+4- push the new image
+
+This will be the code
+
+```
+docker pull postgres:14
+
+docker tag devopseasylearning/s6christopher: Devops
+
+docker login 
+     username:devopseasylearning
+     password:DevOps2021@
+
+docker push devopseasylearning/s6christopher:postgres:14
+```
