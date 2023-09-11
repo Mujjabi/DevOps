@@ -83,6 +83,13 @@ Unofficial has not been verified and certified by docker. Forexample ubuntu is c
 
 For nonofficial image, you have the account name before the slash (devopeasylearning), the repository name after the slash(s5ramces) and image name after the : (latest).
 
+Sometimes, the company can pull an official image like ubuntu, add some security packages and then push it back to their own repository under a different image name.
+
+Forexample, we can tag the image ubuntu and rename it to something else.  
+
+docker tag ubuntu:latest  #This is official image of ubuntu
+docker tag devopseasylearning/S6:V2.0.0   #This is unofficial image called V2.0.0 from the S6 directory under the account of devopseasylearning. 
+
 ### Exercise
 1- pull the  image called "postgres:14"
 
@@ -95,16 +102,113 @@ For nonofficial image, you have the account name before the slash (devopeasylear
 
 4- push the new image
 
-This will be the code
+This is how to do it.
+First you need to **tag** the image before you push it. Docker Image tags are simple labels or aliases given to a docker image before or after building an image to describe that particular image. Here, I am labeling postgres14 as "dockerimages" in s6christopher. However, since this is not an official image, we have to login in order to complete the authentication process before docker lets us pull the image. This step is not done for official images like ubuntu. 
 
 ```
-docker pull postgres:14
+root@s6christopher@EK-TECH-SERVER03:/student_home# docker tag postgres:14 devopeasylearning/s6christopher:dockerimages
+root@s6christopher@EK-TECH-SERVER03:/student_home# docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: devopeasylearning
+Password: DevOps2021@
+Authenticating with existing credentials...
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
 
-docker tag devopseasylearning/s6christopher: Devops
+Login Succeeded
+```
 
-docker login 
-     username:devopseasylearning
-     password:DevOps2021@
+After logging in to docker, we are authenticated, and we can now push the image to s6christopher. Here, devopeasylearning is the account to upload the images and s6christopher is the repository. This is like having a google account and a folder. You can upload anything into that folder without logging in. 
+```
+root@s6christopher@EK-TECH-SERVER03:/student_home# docker push devopseasylearning/s6christopher:dockerimages
+The push refers to repository [docker.io/devopseasylearning/s6christopher]
+04e017127c16: Mounted from devopseasylearning/s6colince
+062ec552e2ba: Mounted from devopseasylearning/s6colince
+7fc968c31077: Mounted from devopseasylearning/s6colince
+f92e92c27185: Mounted from devopseasylearning/s6colince
+100a5a1ba358: Mounted from devopseasylearning/s6colince
+47773d43262e: Mounted from devopseasylearning/s6colince
+14c8967e9af9: Mounted from devopseasylearning/s6colince
+c775f22000b9: Mounted from devopseasylearning/s6colince
+99238cd3e254: Mounted from devopseasylearning/s6colince
+913650ffc054: Mounted from devopseasylearning/s6colince
+fa5241af99da: Mounted from devopseasylearning/s6colince
+faf4c37880d0: Mounted from devopseasylearning/s6colince
+a2d7501dfb35: Mounted from devopseasylearning/s6colince
+dockerimages: digest: sha256:08f848e81ab9501ad9eb1e7948a6e9c2c6db7d63104b77703ad8125cd61b51cc size: 3040
+```
 
-docker push devopseasylearning/s6christopher:postgres:14
+Also, you can only push images to the account you have authenticated with. Forexample, on facebook, chris and chris-1 are 2 different accounts. Here I had made a mistake when tagging the images, when I wanted to push, it wasnt working. 
+```
+root@s6christopher@EK-TECH-SERVER03:/student_home# docker tag postgres:14 devopeasylearning/s6christopher:dockerimages   #I missed the s in devopseasylearning. 
+root@s6christopher@EK-TECH-SERVER03:/student_home# docker push devopseasylearning/s6christopher:dockerimages
+The push refers to repository [docker.io/devopseasylearning/s6christopher]
+An image does not exist locally with the tag: devopseasylearning/s6christopher    #Therefore I had issues here.
+```
+
+
+# Container and Dockerfile
+An Image is just a sheet of paper with specific instructions about the container you need.
+The first thing you do is tell docker the operating system you want your container to have. For example , I want my container to have ubuntu linux flavor. You created a dockerfile.
+The first word of the Dockerfile on each line has to be capitalized. 
+
+Here is an example of a dockerfile with commands. 
+
+```
+FROM ubuntu:22.04  #Here you set up the default image in the container. The version required is determined by the developer of the application. The developer will tell u. 
+WORKDIR S6_Session  #This helps to set "Devops" as your default directory in the container. Every time you log into the container, this will be your working directory. Docker creates it.
+RUN mkdir S6christopher  #This is used to run a command. This command create a directory inside s6-session directory. 
+COPY remoterepository .  #copy code from remoterepository to current working directory. 
+COPY . .  #copy everything from virtual machine and paste it in my working directory (s6_Session) in the container. I.e copy the entire application code
+ADD . .  #This is the same as copy and are interchangeable. But ADD you can copy remote files (equvalent of wget or curl), but COPY doesnt. Download using a link from website. see below
+ADD https://en.wikipedia.org/wiki/DevOps_toolchain#/media/File:Devops-toolchain.svg .  #This will download the image and add it here. 
+RUN useradd blandine  #created a new user. 
+USER blandine  #This changes the default user to blandine. This means, everytime you login into the container, this will be the user instead of root.  
+USER 1000 #This can me switched to the UID of the user. If you run the id of the user. Everything that runs below will be executed by the user, therefore they should have the right permission or set them at the end. Forexample, to install something, u need a root. And you cant use Sudo. 
+```
+
+##Exercise
+There is a git repository located at https://github.com/devopseasylearning/S4-pipelines.git holding an application code directories called TF, UI, auth and DB
+
+The defaut user for the container is called devopseasy learning the application codes mentioned above should be placed in the container directory called app located under the / directory
+
+The base image is ubuntu: 18.04
+
+```
+FROM ubuntu:18.04
+WORKDIR /app
+
+RUN apt-get update
+RUN pat-get install -y git
+RUN git clone https://github.com/devopseasylearning/S4-pipelines.git  #Clone the repository inside the container from the virtual machine (copying files and codes)
+
+RUN mv S4-pipelines/TF S4-pipelines/UI S4-pipelines/auth S4-pipelines/DB . #move all these files in my current container directory 
+RUN rm -rf S4-pipelines  #delete it since we have copied what we want. 
+
+RUN useradd devopseasylearning  
+USER devopseasylearning  #This is put at the end since devopeasylearning doesnt have permission to run some sudo commands above.
+
+```
+We can also clone the repository onto our virtual machine so that we dont have to clone the whole repo onto our container
+
+```
+git clone https://github.com/devopseasylearning/S4-pipelines.git 
+cd S4-pipelines
+
+FROM ubuntu:18.04
+WORKDIR /app
+COPY TF /app/TF
+COPY UI /app/UI
+COPY auth /app/auth
+COPY DB /app/DB
+RUN useradd devopseasylearning  
+USER devopseasylearning  #This is put at the end since devopeasylearning doesnt have permission to run some sudo commands above.
+```
+
+
+# Accessing the container
+To enter the container, run this code
+```
+docker run -it s4 bash  
 ```
