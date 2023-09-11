@@ -168,10 +168,10 @@ USER blandine  #This changes the default user to blandine. This means, everytime
 USER 1000 #This can me switched to the UID of the user. If you run the id of the user. Everything that runs below will be executed by the user, therefore they should have the right permission or set them at the end. Forexample, to install something, u need a root. And you cant use Sudo. 
 ```
 
-##Exercise
-There is a git repository located at https://github.com/devopseasylearning/S4-pipelines.git holding an application code directories called TF, UI, auth and DB
+## Exercise
+There is a git repository located at https://github.com/devopseasylearning/S4-pipelines.git holding application code directories called TF, UI, auth and DB
 
-The defaut user for the container is called devopseasy learning the application codes mentioned above should be placed in the container directory called app located under the / directory
+The default user for the container is called devopseasylearning the application codes mentioned above should be placed in the container directory called app located under the / directory
 
 The base image is ubuntu: 18.04
 
