@@ -212,3 +212,77 @@ To enter the container, run this code
 ```
 docker run -it s4 bash  
 ```
+
+# Containalization of an application
+- Ask the developer the language of the application. This determines the base image 
+- does the application needs to persist any volume?
+
+- Is there any specific pop 
+
+- Does the application need -- to start? 
+
+Forexample, When a devoper tells you to build a docker.file for the application, you need to know what langauge they used.
+Forexample golang:1.16 or ubuntu:18.04 etc.
+
+Therefore, when building a docker file, it can handle any golang application that was developed using the libraries of golanf:1.16 or ubuntu:18.04 or less. Should be equal or below, Nothing more than this. If you use golang:1.17 or 20.04, the dockerfile will automatically file. Even if the dockerfile hasnt been changed at all. This is because the libraries of newer images (golang and ubuntu) dont match. 
+
+Dockerfile version needs to be above the application. Always ask the developer which version they are using (golang 1.16), and you choose one equal or above it to develop the docker file. This is what mantaining the dockerfile, changing the "FROM" argument to bump up the Operating System.
+
+## Environment Variables
+Environment variables in Docker are a way to pass configuration information and other data to a container at runtime. Docker allows you to set environment variables within a container, either by specifying them in your Dockerfile or by passing them as arguments when running a container. 
+
+You can set environment variables directly in your Dockerfile using the ENV instruction. Here's an example:
+```
+FROM some_base_image
+# Set environment variables
+ENV DB_HOST=localhost
+ENV DB_PORT=5432
+ENV APP_ENV=production
+```
+
+
+## Port and Expose command
+A port is a like a hole that we put on the container to see whats inside. These holes are called ports. You can have multiple ports. 
+
+In a Dockerfile, the EXPOSE instruction is used to indicate which ports should be made accessible from the container to the host system or other containers. However, it's important to understand that using EXPOSE alone doesn't actually open or publish these ports; it simply documents which ports the container is designed to listen on.
+
+```
+FROM some_base_image      # Specify the base image
+
+EXPOSE 80      # Expose a port for the application to listen on
+
+EXPOSE 50, 80, 8080, 5050, 1000, 5000  #select specific ports
+EXPOSE 80-1000  # a range of ports 
+
+```
+
+In this example, EXPOSE 80 indicates that your container will be listening on port 80.
+
+
+## The Volume
+Volume is just a storage where the application stores information. Forexample , on facebok, when you connect to facebook and loginto your account, when you upload a foto, it is stored on the volume.
+
+In the context of Docker and containerization, a "volume" refers to a Docker feature that allows you to manage and persist data independently of the container itself. Volumes are used for storing and sharing data between containers, between the host and containers, or simply for persisting data that should survive even if a container is stopped, removed, or replaced.
+
+## CMD or command
+This is the first command that will run when your container starts.  Forexample to enter the container via terminal, we run this command
+
+CMD is an instruction in a Dockerfile that specifies the default command to run when a container is started from the Docker image. It defines the executable and any arguments that should be passed to it. The CMD instruction is typically used to provide the primary command or process that should run inside the container when it starts. If you provide multiple CMD instructions in a Dockerfile, only the last one will take effect
+```
+docker run -it s6 bash
+
+```
+With a docker file, we include this command under the command "CMD". If you have multiple CMDs in your docker file, docker will only consider the last CMD
+CMD changes based on the language used to build the application. Forexample, images like Ubuntu, nginx, we use bash. 
+```
+CMD ["python", "app.py"]  #applications built in python
+
+CMD ["bash"]   #Application built with ubuntu
+
+```
+
+
+
+
+
+
