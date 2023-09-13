@@ -59,6 +59,10 @@ Images are drawn pixel by pixel
 ## Group discussion 
 1. 
 
+X-decimal colors. "00FFAA" A = 10, F = 16.  These are RGB tripples (red, green and blue)
+
+HSV : Hue Saturation Value 
+
 
 
 
