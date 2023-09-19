@@ -41,6 +41,17 @@ There are several types of shells available in Linux, including:
 
 - Fish: This modern shell is designed to be user-friendly and easy to use. It features syntax highlighting and auto-suggestions, among other things.
 
+A shell is basically an interpreter between the computer and the user. The user types commands, and the shell sends it to the bin directory for interpretation. 
+
+### the /bin directorry vs sbin
+The bin directory is for regular users while sbin is for super users. All the commands written by regular users is executed in the bin directory while root users is in the sbin directory.
+
+Forexample if you are a regular user using bash shell,  the default commands are executed in as below. 
+```
+ /bin/bash -c ls
+```
+This is the same as running the ls command. 
+
 ## Signs 
 $ - If you have this sign when you login to the server, you are just a regular user 
 

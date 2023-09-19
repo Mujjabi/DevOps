@@ -281,7 +281,21 @@ CMD ["bash"]   #Application built with ubuntu
 
 ```
 
+CMD ["./my_app"]
+CMD ["/bin/bash -c ./my_app"]   #this is the same as the previous 
 
+## ENTRYPOINT
+This is also the first command that run when the container start. The entry point is basically specifies the shell that will be used to execute the CMD command. Therefore, CMD and ENTRYPOINT are complimentary and run as a combination. When the container starts, the combination Entrypoint-CMD run. 
+The default entry point is /bin/bash -c but this can be changed or over written if the entry point is specified. 
+```
+CMD ["-b"]
+
+```
+If the entrypoint is not specified in the dockerfile as shown below, the entry point will automatically be /bin/bash -c as defaultt. But if the entrypoint is specified, it will override the default, as shown below. 
+```
+ENTRYPOINT ["top"]
+CMD ["-b"]
+```
 
 
 
