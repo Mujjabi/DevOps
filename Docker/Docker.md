@@ -297,6 +297,110 @@ ENTRYPOINT ["top"]
 CMD ["-b"]
 ```
 
+## Reducing the size of the image
+One way to reduce the size of the image is by reducing the number of layers in the dockerfile by combining the **EXPOSE** and **RUN** if possible. Forexample instead of having multiple expose layer for different ports, i can put all the ports in one expose layer and same for run. However, sometimes, the position matters. Sometimes, some commands can not be combined. Forexample, if the developer wants a certain run to be executed after certain step, then this run cant be combined. 
+```
+EXPOSE 80
+EXPOSE 8080
+EXPOSE 6000
+EXPOSE 5800
+
+RUN apt update
+RUN apt install -y curl
+RUN apt install -y pip
+RUN apt install -y git
+```
+This will make the dockerfile to have 8 layers already hence making it heavy. However, this can be compressed into 2 layers as shown below
+
+```
+EXPOSE 80 8080 6000 5800
+
+RUN apt update && apt install -y curl pip git
+```
+This helps to make the dockerfile be as light as possible. 
+
+## COPYING Content from one container to another container
+We can copy from one container to another in just one docker file. 
+Usually used to deploy the application. 
+
+- Java application with javacode build using maven (artifact)  needs tomcat to be deployed
+- html needs httpd or apache to deploy
+
+Forexaple
+1. need maven container to build the artifact
+2. copy the artifact into a dockerfile and build it using docker
+3. i will use thedocker image from docker build to start the application inside a tomcat container 
+
+Or we can do the following Using the multi-stage  
+1. we use maven as a bulder , then we start tomcat container and copy the build artifact from maven inside a single docker file. 
+
+```
+FROM maven:3.8.7-openjdk-18 as Builder
+WORKIR /maven
+COPY . . #copy from image to /maven
+RUN mvn clean install package
+
+FROM tomcat:9-jdk11-openjdk-slim
+RUN rm -rf /user/local/tomcat/webapp/*
+
+COPY --from=Builder /maven/target/ui-0.0.1-SNAPSHOT.jar /usr/local/tomcat/webapps/
+
+FROM tomcat:8.0-alpine
+COPY webapp/target/webapp.war /usr/local/tomcat/webapps/
+
+CMD ["/bin/bash"] #if the develpoer doesnt ask to put cmd, u dont have to because its already default
+```
+
+#the back slash at install means the linux will read it as one line
+#user zero is the group of the root 
+#build --build-arg TAG=22.04 --build-arg APP_NAME =s6 --build-arg ENV=development 
+```
+docker build --build-arg TAG =22.04 --build-arg APP_NAME=S6 --build-arg APP_NAME="learning_dockerfile" -t  devopseasylearning/s6christopher:V1.0.1 .
+
+```
+
+# Build contest 
+Docker saves the build contest in memory. The first time to build an image, it takes a long time, but the next time it will take a few seconds since layers are already in memory.
+
+There is a command to stop the build contest from being saved. 
 
 
 
+## Docker prune
+This means delete everything that is not being used. it is a very dangerous command and should be careful using it.
+
+```
+Docker image
+
+docker system prune - fa
+```
+
+# DockerHub
+This is a regitry of all images. the overview section shows you if the image is official or not, and how to download it, how many times its been downloaded. 
+
+The tag sections shows you the different tags.  
+
+## Starting a container
+There are 2 ways to start a container. The command to spin a container is docker run. 
+Start a container by getting inside or start a container by not getting inside. 
+the interactive mode and the interactive detach mode. The -itd tells Docker to run the container in the background or detached mode.
+``` 
+docker run -itd ubuntu bash  #this doesnt log you into the container. d for detach
+
+
+docker run -it ubuntu bash   #this logs you in a container
+docker ps
+```
+
+The commands 
+
+```
+docker run -it ubuntu
+```
+and 
+
+```
+docker run -it ubuntu bash
+```
+Whatever command after the image is the first command that will run when the container starts. 
+If its not specified, this command is the default CMD in the dockerfile. 
