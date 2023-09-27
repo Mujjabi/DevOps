@@ -259,6 +259,16 @@ EXPOSE 80-1000  # a range of ports
 In this example, EXPOSE 80 indicates that your container will be listening on port 80.
 
 
+![Alt text](<WhatsApp Image 2023-09-26 at 21.23.09.jpg>)
+
+
+Fig above, we see that both the host and the container should have the expose (port) so that we can see the application. 
+
+```
+docker run -itd --name my-running-app -p 8080:80 my-apache2
+
+```
+
 ## The Volume
 Volume is just a storage where the application stores information. Forexample , on facebok, when you connect to facebook and loginto your account, when you upload a foto, it is stored on the volume.
 
@@ -483,4 +493,23 @@ Also, the free -h command shows the memory of the virtual machine.
 
 
 ## Volume 
+The volume is basically a storage for the data center. For example, when you upload a foto to facebook, it is not stored in your phone, it is stored in the volume(data center). Therefore, you can acess this foto on your laptop, ipad, or someone in uganda, will see the same phone. This is because the phone is just a displayer, the real information (foto) is stored in volume. This is called **persist volume**. 
 
+![Alt text](<WhatsApp Image 2023-09-26 at 20.15.21.jpg>)
+
+This is important because containers are **ephemeral** ,meaning they can die suddenly. Therefore, if they die, all the information cant be lost because its stored in the volume. 
+The volumes are also divided in sub volumes to ensure security. So they are backedup. 
+
+![Alt text](<WhatsApp Image 2023-09-26 at 20.16.45.jpg>)
+
+Volume can come from multiple sources.
+
+## Mount volume in the container
+```
+docker run -it -v eric:/Chris -w /a ubuntu bash
+```
+
+**eric:/a** Eric is the volume located in the virtual machine, andafter the column is the directory which will have volume in the container. If this directory in the container doesnt exit, docker will create it. 
+
+# Remember
+- spy the base image - it has the dockerfile content. 
