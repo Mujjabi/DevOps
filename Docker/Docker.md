@@ -380,6 +380,15 @@ This is a regitry of all images. the overview section shows you if the image is 
 
 The tag sections shows you the different tags.  
 
+## Image Commands
+- download
+-  upload
+- list
+- prune
+- remove
+- rename
+- inspect 
+
 ## Starting a container
 There are 2 ways to start a container. The command to spin a container is docker run. 
 Start a container by getting inside or start a container by not getting inside. 
@@ -404,3 +413,74 @@ docker run -it ubuntu bash
 ```
 Whatever command after the image is the first command that will run when the container starts. 
 If its not specified, this command is the default CMD in the dockerfile. 
+
+### what can we do with a container
+- start a container without login 
+- start and automatically login
+- stop a container
+- restart a container
+- name a container
+- ssh into a running container
+- list only runnung container
+- list all containers 
+- expose an application inside a container
+- persist or mount volume
+- take the image that gave birth to  the container
+- inspect a container 
+
+## Docker pull not necessary
+When the image is not present locally and you press a command docker run, it will download/pull the name remotely. Therefore you dont have to docker pull. here is the example. 
+
+```
+root@s6christopher@EK-TECH-SERVER03:/student_home# docker run -itd centos:centos8 bash
+Unable to find image 'centos:centos8' locally
+centos8: Pulling from library/centos
+a1d0c7532777: Pull complete
+Digest: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+Status: Downloaded newer image for centos:centos8
+docker ima7d9762baaf082c7cca077e67d7b1fa5484327d803f6f8902c34848eb7e9d6a6c
+root@s6christopher@EK-TECH-SERVER03:/student_home# docker images
+REPOSITORY                                   TAG       IMAGE ID       CREATED        SIZE
+fritz-python                                 latest    27072207face   22 hours ago   1.02GB
+<none>                                       <none>    a865f4c52447   23 hours ago   77.8MB
+s6-test                                      latest    ed02e9231449   2 days ago     287MB
+devopseasylearning2021/master-ubuntu-image   004.5     1aeabaa52d2b   2 months ago   5.32GB
+centos                                       centos8   5d0da3dc9764   2 years ago    231MB
+```
+
+Here we see that the image centos8 wasnt present localy, but docker was able to pull it remotely.
+## Naming container
+If you dont name the container before pulling it, docker will assign an ID to the container before pulling it. If you give it a name option, the container will be names as that name. 
+
+```
+docker run -itd --name Chris centos:centos8 bash
+
+```
+This will name the image as chris
+
+
+
+
+## Docker ps
+This command shows only the running container. But if you want to show all containers (running and stopped), 
+
+```
+docker ps   #only running container
+docker ps -a   #all containers
+```
+
+## Run commands in a running container without stepping inside the container
+The command below shows that we are running this list list of commands in a container with ID 718. Docker knows the container by its name or ID. And since the id is unique, you dont have to pull the full id. You can put the first 3 or last 3 digits and docker will still recognize it. 
+
+To enter or ssh into a running container without entering the container, we use docker exec command below. I want docker to run these commands in a container with ID 718. 
+```
+docker exec -it 718 ls; pwd; uname
+docker exec -it 718 bash -c "cat/etc/*rel*; free -h"
+```
+The bash -c " " helps to run super long commands. If you dont use this, docker will complain. 
+
+Also, the free -h command shows the memory of the virtual machine. 
+
+
+## Volume 
+
