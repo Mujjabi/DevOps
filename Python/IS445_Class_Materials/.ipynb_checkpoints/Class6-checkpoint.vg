@@ -1,0 +1,29 @@
+
+{
+  "data": {"url": "building_inventory.csv"},
+  "vconcat": [
+    {
+      "layer": [
+      {
+          "mark": {"type": "bar"},
+          "encoding": {
+            "x": {"field": "Agency Name", "type": "ordinal"},
+   "sort": "-y"},
+            "y": {"aggregate": "count"},
+            "color": {"value": "grey"},
+            "tooltip": [{"aggregate": "count"}]
+    }
+    },
+    {
+      "mark": {"type": "point", "shape": "diamond"},
+      "params": [{"name": "myfirstparam", "select": "interval"}],
+      "encoding": {
+        "x": {"field": "Year Acquired", "type": "quantitative"},
+        "y": {"field": "Year Constructed", "type": "quantitative"},
+        "color": {"value": "grey", "condition": {"param": "myfirstparam"}}
+      }
+    }
+  ]
+}
+
+
