@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app   #no list because its a parent
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sample-app
+  template:
+    metadata:
+      labels:
+        app: sample-app
+    spec:
+      containers:  #since you can have multiple containers, these containers can be a list, and each list is read as one broke. 
+        - name: sample2               
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+            - TargetPort: 8080
+
+        - name: sample3
+          image: ubuntu:latest
+          ports:
+            - containerPort: 80
+            - TargetPort: 8080

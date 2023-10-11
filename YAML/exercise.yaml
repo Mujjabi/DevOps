@@ -1,0 +1,55 @@
+
+my name is Eric I work for DEL as an engineer in the following field devops, linux and aws. 
+My country name is cameroon and I grew up in a  city there called douala where our house was located 
+in bonaberie.
+ I attended three schools lypobo, classic, lybibo and also one university called enset-douala.
+In the devops field I worked with tools such as ansible, git, github, k8s, jenkins. in aws field I worked with
+services such ec2, vpc, route53, iAM, when it comes to linux field I worked on patching servers,
+ troubleshooting servers
+movies and soccer are my best hobbies.
+
+
+User:
+    Name: Eric
+  
+    Address:
+      - Country: Cameroon
+        City: Douala
+        Street: Bonaberie
+
+    Occupation: Engineer
+
+    Employer: DevOps Easy Learning
+
+    Field:
+      - Devops:
+          - ansible
+          - git 
+          - github 
+          - k8s 
+          - jenkins
+
+      - linux:
+          - Patching servers
+          - troubleshooting servers
+      - aws:
+          - ec2
+          - vpc 
+          - route53 
+          - iAM
+
+    Education: 
+       - Schools: 
+            - lypobo 
+            - classic 
+            - lybibo 
+
+        - Universities: 
+            - enset-douala
+
+    Hobbies:
+        - Soccer
+        - Movies
+
+
+

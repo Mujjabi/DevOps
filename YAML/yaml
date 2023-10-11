@@ -1,0 +1,61 @@
+Car:
+  * Toyota
+          - RAV4
+          - 4Runner
+          - Corola
+  * Nissan
+          - Rogue
+          - Sentra
+          - pathfinder
+          - Versa
+          - Kicks
+      
+  * Tesla
+          - Model3
+          - Modelx
+          - ModelY
+  * Chevy
+          - Siverado
+          - Impala
+          - Camaro
+  * BMW
+  * Honda
+  * lexus
+  * GmC
+
+#####
+Dictionary
+Car: toyota
+email: eric@gmail.com
+color: red 
+
+EKTech Address:   
+      - Street: 1234 Main street
+        City: Cypress
+        State: TX 
+        Zip: 77889
+
+
+      - Street: 555 David rd 
+        City: Raeford 
+        State: NC
+        Zip: 28376
+
+
+      - Street: 555 David rd 
+        City: Raeford 
+        State: NC
+        Zip: 28376
+
+
+
+Eric Father:
+        Eric
+               - Miles
+               - Chris
+               - Nashea 
+        
+        Ryan
+               - yasser
+               - Mike
+               - Betty            
