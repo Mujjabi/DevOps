@@ -60,35 +60,7 @@ Service:
 
 The minimum number of service you can have is one. if you dont have a service, you dont have a docker-compose file. 
 
-3. ## The declaration
-This is optional and we only use this when we have used network, volume, secrets on services. If one of your services need a network, volume, or network, you have to declare it. 
 
-```
-
-version: '3'
-
-Services:
-    Covid19:
-       image:
-       container-name: 
-       ports: 80
-
-    Newyear:
-       image:
-       container-name: 
-       ports: 80
-   
-Volume:
-    db-data:
-
-secrets:
-    db-password:
-        file: db/password.txt
-
-networks:
-    backnet:
-    frontnet:
-```
 
 ### Network
 We add the network section so that its easy for containers to communicate. When you put the containers under the same network, they can easily communicate easily. 
@@ -159,5 +131,32 @@ Ports are unique, so you can expose the same port twice. this will give you erro
 2. Two or more containers cannot have the same name
 3. Two or more services cannot have the same name.
 
+## The declaration
+This is optional and we only use this when we have used network, volume, secrets on services. If one of your services need a network, volume, or network, you have to declare it. 
 
+```
 
+version: '3'
+
+Services:
+    Covid19:
+       image:
+       container-name: 
+       ports: 80
+
+    Newyear:
+       image:
+       container-name: 
+       ports: 80
+   
+Volume:
+    db-data:
+
+secrets:
+    db-password:
+        file: db/password.txt
+
+networks:
+    backnet:
+    frontnet:
+```
