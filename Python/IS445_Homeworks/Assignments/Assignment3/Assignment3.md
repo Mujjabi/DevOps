@@ -16,13 +16,14 @@ This will have three steps:
 2. Deploy this visualization in JSON format to your GitHub pages
 3. Write the initialization javascript code to create the visualization in your page
 
-You will have three weeks, as we have not covered quite enough yet to make the final step work.
-
 What to submit: A PDF file containing (1) a link to your GitHub repository and (2) a link to the page showing the visualization.
 
 ## Links
-1. link to github repository: 
+1. link to github repository:
+
+        https://github.com/Mujjabi/Assignment3_Mujjabi2 
 
 
 2. Link to the page showing the visualization:
 
+        https://mujjabi.github.io/Assignment3_Mujjabi2/
