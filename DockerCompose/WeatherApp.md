@@ -41,3 +41,11 @@ db:
       - REDIS_USER=redis
       - REDIS_PASSWORD=redis
     restart: always
+
+
+
+    ## 
+    docker login -u devopseasylearning -p dckr_pat_e_n214_A6_fX1p8q9nNFmsIQkvA
+
+    clone from prince
+    git@github.com:PrinceDalton/Begin.Practice.git
