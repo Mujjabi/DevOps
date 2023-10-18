@@ -67,9 +67,9 @@ services:
       - REDIS_USER=redis
       - REDIS_PASSWORD=redis
     expose:
-      - 3000
+      - 3500
     ports:
-      - 3000:3000
+      - 3500:3500
     networks:
       - thomisis
     restart: always
