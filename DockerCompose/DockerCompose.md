@@ -160,3 +160,32 @@ networks:
     backnet:
     frontnet:
 ```
+
+
+## persist the volume
+- when you have a database container, you need to persist the volume. 
+
+# Weaknesses of docker-compose
+
+## 1. Changes in docker file
+Any changes made to one of the containers, the container goes down before it goes up again. This means the application goes down during these changes and thats not good for business.
+
+
+## 2. Single point of failure
+When the container dies, the application downs
+
+## 3. Not fault-tolerant
+
+## 4. Auto discovery
+Sometimes we want applications to discover each other and communicate. 
+The network the docker-compose creates stays in the virtual machine, therefore if a container from one app tries to discover containers outside the compose, it will fail because they are not in the same network. 
+
+## 5. No update/rollback without any downtime
+
+we want the applications to stay up as e update or rollback.
+
+## 6. No self-healing mechanisms
+Sometimes services fail for no reason, unfornutanely, DC doesnt have the capacity to restart containers that fail, replace containers, kill containers that dont respond to health checks etc. 
+
+## 7. Autoscaling
+Has no mechanism to autoscale.  
