@@ -29,22 +29,40 @@ The cloud provider will always guarantee a working control plane if anything hap
 When k8 is in the cloud and you didn't build the infrastructure, we say you **consume k8**. This is the difference between administering and consuming. Administer on premise, consume on cloud.
 
 ### K8 providers:
-Amazon Web Services (AWS): AWS offers Amazon Elastic Kubernetes Service (EKS) for managing Kubernetes clusters on their cloud platform.
-Google Cloud Platform (GCP): GCP provides Google Kubernetes Engine (GKE) for running and managing Kubernetes clusters.
-Microsoft Azure: Azure Kubernetes Service (AKS) is Microsoft's managed Kubernetes offering.
-IBM Cloud: IBM Cloud Kubernetes Service is IBM's managed Kubernetes solution.
-Oracle Cloud: Oracle Cloud Container Engine for Kubernetes (OKE) is Oracle's managed Kubernetes service.
-DigitalOcean
-Alibaba Cloud also offers managed Kubernetes services.
+- Amazon Web Services (AWS): AWS offers Amazon - Elastic Kubernetes Service (EKS) for managing - Kubernetes clusters on their cloud platform.
+
+- Google Cloud Platform (GCP): GCP provides Google Kubernetes Engine (GKE) for running and managing  Kubernetes clusters.
+
+- Microsoft Azure: Azure Kubernetes Service (AKS) is Microsoft's managed Kubernetes offering.
+
+- IBM Cloud: IBM Cloud Kubernetes Service is IBM's managed Kubernetes solution.
+
+- Oracle Cloud: Oracle Cloud Container Engine for - Kubernetes (OKE) is Oracle's managed Kubernetes - service.
+
+- DigitalOcean
+
+- Alibaba Cloud also offers managed Kubernetes services.
 
 ## The workflow
 ![Alt text](image-1.png)
 **The application -> Container -> Pod -> Node -> cluster -> Control Plane**
+
 The application lives inside the container, the container lives inside the pod, the pod lives inside the node, the node lives inside the cluster, the cluster is controlled by the control plane
 Node is a common virtual machine. 
 
 Cluster is an envelope around the node
 
 pod is an envelope around the container 
+
+## The Node
+These 3 will be installed on every single node. 
+
+![Alt text](<WhatsApp Image 2023-10-23 at 20.15.55_39308ac3.jpg>)
+
+   - Kubelete: This is an agent of k8 and its the one running the show. Over sees all processes in the cluster. It works for me. 
+
+   - Docker: Needed in each node to make and spin - containers. This is an agent for docker-engine
+
+   - Kubeproxy: As long as you here the work "proxy" in IT. It has something to do with networking. kube proxy is a port that manages networking. If you deploy the application and you see the app in the browser, its the proxy that exposes the app the external.Its a port and not an agent. 
 
 
