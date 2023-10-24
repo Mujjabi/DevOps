@@ -44,7 +44,7 @@ When k8 is in the cloud and you didn't build the infrastructure, we say you **co
 - Alibaba Cloud also offers managed Kubernetes services.
 
 ## The workflow
-![Alt text](image-1.png)
+![Alt text](<WhatsApp Image 2023-10-23 at 20.34.39_c2665ffd.jpg>)
 **The application -> Container -> Pod -> Node -> cluster -> Control Plane**
 
 The application lives inside the container, the container lives inside the pod, the pod lives inside the node, the node lives inside the cluster, the cluster is controlled by the control plane
@@ -55,13 +55,13 @@ Cluster is an envelope around the node
 pod is an envelope around the container 
 
 ## The Node
-These 3 will be installed on every single node. 
+These are the 3 major components of the node. They have to be installed on every single node. 
 
 ![Alt text](<WhatsApp Image 2023-10-23 at 20.15.55_39308ac3.jpg>)
 
-   - Kubelete: This is an agent of k8 and its the one running the show. Over sees all processes in the cluster. It works for me. 
+   - Kubelete: This is an agent of k8 and its the one running the show. Over sees all processes in the cluster. It works for me. This will create port. 
 
-   - Docker: Needed in each node to make and spin - containers. This is an agent for docker-engine
+   - Docker: Needed in each node to make - containers. This is an agent for docker-engine
 
    - Kubeproxy: As long as you here the work "proxy" in IT. It has something to do with networking. kube proxy is a port that manages networking. If you deploy the application and you see the app in the browser, its the proxy that exposes the app the external.Its a port and not an agent. 
 
