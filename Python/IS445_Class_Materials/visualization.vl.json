@@ -22,6 +22,33 @@
         "key": "id"
       }
     },
+
+### Building inventory data
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://uiuc-ischool-dataviz.github.io/ fall2023-acg-acu/data/building_inventory.csv"
+  },
+  "transform": [
+  {
+    "joinaggregate": [{"op": "count", "as": "agency_count"}],
+    "groupby": ["Agency Name"]
+  },
+  {"window": [{"op": "dense_rank", "as": "rank"}],
+   "sort": [{"field": "agency_count", "order": "descending"}]
+  },
+  { "filter": {"field": "rank", "lte": 5}}, 
+  {
+    "window": [{"op": "sum", "field": "Square Footage",
+    "as": "Total Footage"}],
+    "frame": [null,0],
+    "sort": [{"field": "Year Acquired", "order": "ascending"}],
+    "groupby": ["Agency Name"]
+   }
+  ],
+
+
+
     {
       "filter": {
         "valid": true,
