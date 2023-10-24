@@ -38,6 +38,7 @@ DigitalOcean
 Alibaba Cloud also offers managed Kubernetes services.
 
 ## The workflow
+![Alt text](image-1.png)
 **The application -> Container -> Pod -> Node -> cluster -> Control Plane**
 The application lives inside the container, the container lives inside the pod, the pod lives inside the node, the node lives inside the cluster, the cluster is controlled by the control plane
 Node is a common virtual machine. 
