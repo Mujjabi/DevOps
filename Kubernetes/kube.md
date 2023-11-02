@@ -185,7 +185,7 @@ It wont give us the base64 encoded response cmVkaXM= , it will give us the actua
 
 **Also, the pod needs secret and configmap as objects to run**
 
-2 different objects can carry the same name. Forexample, the configmap and the secret can both have the same name. 
+2 different objects can carry the same name. For example, the configmap and the secret can both have the same name. 
 
 ## Inspecting pod objects
 Using the command below, we can inspect the status and properties of each object in the pod. 
@@ -194,25 +194,26 @@ kubectl get deploy, cm, secret, po
 ```
 ![Alt text](image-8.png)
 
-We can see the that there is one deployment file expected, and its running.
+We can see that there is one deployment file expected, and it's running.
 
-We can see the the configmap with data 6. Meaning that there are 6 environmental variables in our configmap.
+We can see the configmap with data 6. Meaning that there are 6 environmental variables in our configmap.
 
 We can also see that there is a secret object, with 5 environmental variables.
 
-We can also see the pod, and its ready and running. 
+We can also see the pod, and it's ready and running. 
 
 ## 3. Deployment file 
-This is a yaml file that is like the docker-compose file, it refers to the config map and the secret after they have been created (separately). This file collects the information from these dependant file (sec and cm), in order to create a pod. Therefore, ***the deployment gives birth to the pod***
+This is a YAML file that is like the docker-compose file, it refers to the config map and the secret after they have been created (separately). This file collects the information from this dependant file (sec and cm), to create a pod. Therefore, ***the deployment gives birth to the pod***
 
-In order for the pod to be created, the configmap and secret have to be created or deployed before the deployment file is run. This is like building a car, the car cannot be driven before all the parts are put together, the driving comes last after all parts have been built and assembled together. 
+In order for the pod to be created, the configmap and secret have to be created or deployed before the deployment file is run. This is like building a car, the car cannot be driven before all the parts are put together, and the driving comes last after all parts have been built and assembled together. 
 
 # 4. The Scheduler and Demon Set 
-Its in charge of pod scheduling. This tells where the pod will be created. Which node to create the pod. etc. 
+It's in charge of pod scheduling. This tells where the pod will be created. Which node to create the pod. etc. 
 The scheduler assigns work (pods) to nodes based on resource requirements, constraints, and other policies. 
-The scheduler works like a human being, if the node has less pods, it will schedule all the new pods in the node with less pods. For example, if i have 6 nodes, below, the scheduler will put all pods in node 3 (red pods) as shpwn below. 
+The scheduler works like a human being, if the node has less pods, it will schedule all the new pods in the node with less pods. For example, if I have 6 nodes, below, the scheduler will put all pods in node 3 (red pods) as shown below. 
 
-Each pod to be scheduled is responsible for going to each node and collect the metrics of that node (CPU, Memoray, Storage and Logs) to the datacenter, in order to know its status and capability before any other pods are added. 
+
+Each pod to be scheduled is responsible for going to each node and collecting the metrics of that node (CPU, Memory, Storage and Logs) to the datacenter, in order to know its status and capability before any other pods are added. 
 
 
 However, if we rely on the scheduler to distribute these pods to collect the metrics, we cant get information of all nodes since pods will only be scheduled on nodes with less pods. 
