@@ -5,6 +5,7 @@ Visualization Report 11
 Student: Christopher Mujjabi
 ----------------------------
 **Date: November 13, 2023**
+
 The visualization titled "Income Needed to be in the top 1% By U.S. States" was obtained from the visual capitalist [website](https://www.visualcapitalist.com/mapped-the-top-1-percent-in-each-u-s-state/) reported by Pallavi Rao on September 25, 2023. The data used to generate the visualization was obtained from SmartAsset, which is a personal finance advisory services company. 
 
 The objective of the visualization is to illustrate the income disparities across U.S. states by showcasing the income thresholds required to be part of the top 1% in each state. Connecticut has the highest threshold at nearly $953K annually, and Massachusetts follows closely at $903K. West Virginia has the lowest income requirement of $368k. 
