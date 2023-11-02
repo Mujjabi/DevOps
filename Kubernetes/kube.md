@@ -74,7 +74,7 @@ These are the 3 major components of the node. They have to be installed on every
  Needed in each node to make  containers. This is an agent for docker-engine to create containers in each node. 
 
 ### Kubeproxy:
-As long as you here the work "proxy" in IT. It has something to do with networking. kube proxy is a port that manages networking. If you deploy the application and you see the app in the browser, its the proxy that exposes the app the external.Its a port and not an agent. If the proxy is not working, your app wont connect to the network. 
+As long as you here the work "proxy" in IT. It has something to do with networking. kube proxy is a pod that manages networking. If you deploy the application and you see the app in the browser, its the proxy that exposes the app the external.Its a pod and not an agent. If the proxy is not working, your app wont connect to the network. 
 
 If the control plane controls the cluster, and the cluster is just an envelope around the node, therefore, the control plane controls the node not the cluster. 
 
@@ -207,15 +207,28 @@ This is a YAML file that is like the docker-compose file, it refers to the confi
 
 In order for the pod to be created, the configmap and secret have to be created or deployed before the deployment file is run. This is like building a car, the car cannot be driven before all the parts are put together, and the driving comes last after all parts have been built and assembled together. 
 
-# 4. The Scheduler and Demon Set 
+# 4. The Scheduler and Daemonset 
 It's in charge of pod scheduling. This tells where the pod will be created. Which node to create the pod. etc. 
 The scheduler assigns work (pods) to nodes based on resource requirements, constraints, and other policies. 
 The scheduler works like a human being, if the node has less pods, it will schedule all the new pods in the node with less pods. For example, if I have 6 nodes, below, the scheduler will put all pods in node 3 (red pods) as shown below. 
-
+![Alt text](<WhatsApp Image 2023-11-01 at 22.45.37_0af9c4b2.jpg>)
 
 Each pod to be scheduled is responsible for going to each node and collecting the metrics of that node (CPU, Memory, Storage and Logs) to the datacenter, in order to know its status and capability before any other pods are added. 
 
 
-However, if we rely on the scheduler to distribute these pods to collect the metrics, we cant get information of all nodes since pods will only be scheduled on nodes with less pods. 
+However, if we rely on the scheduler to distribute these pods to collect the metrics, we cant get information of all nodes since pods will only be scheduled on nodes with less pods. In order to solve this problem, we have to replicate the same pod to go to all nodes so that it collects the metrics. 
+![Alt text](<WhatsApp Image 2023-11-01 at 22.47.00_7592a985.jpg>)
 
-In order to solve this problem, we have to replicate the same pod to go to all nodes so that it collects the metrics. 
+This is where we need a daemonset to make sure that a copy of a pod to be placed on every single node. The deamonset is the technology that helps us to replicate the pods to be placed at all nodes to collect their metrics. 
+
+The deamoset is also a file just like the the configmap and secret file. We dont need to tell the deamonset file how many replicas of the pod to create, it will automatically create the same number of copies as the number of the nodes we have in the k-cluster. D-set makes sure that a copy of the pod runs on every single node. 
+![Alt text](<WhatsApp Image 2023-11-01 at 23.31.21_ec8baa8d.jpg>)
+Here we see datadog node agent pod on repeated or replicated at each one of the 3 nodes. Also, a kube-proxy is another type of a deamonset since it is a pod that is found in each node in the cluster. 
+
+
+## Cron Job in Kubernetes
+
+From linux, we learnt that we can use cronjob to schedule repeated tasks in the future. For example, turn off or stop my instance every 10pm. In kubernetes, if i want to transfer data from pod (volume of the pod) to a datacenter to be safe in case a node is lost. we have the data safe in the datacenter. 
+
+In I.T, when an activity is done repetitively (from time to time) it is called a task. 
+![Alt text](<WhatsApp Image 2023-11-01 at 23.44.47_f5b33d1c.jpg>)
