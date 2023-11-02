@@ -146,7 +146,7 @@ Objects are all components that makes up a pod. The pod consumes all of them to 
 
 ### Note: All objects are written in yaml file
 
-### 1. ConfigMap
+## 1. ConfigMap
 #### PROBLEM: How do we deal with non sensitive data in K8S? How does Docker-compose fail us?
 Docker-compose doesnt separate/split sensitive and non-sensitive information/data in the environment variables, such as user, passwords, etc. Some of the env variables are secrets/sensitive while other are non-senstive. 
 
@@ -159,7 +159,7 @@ The good news is that, in k8s, the 2 datas are stored separetely in 2 different 
 
 **A ConfigMap is a Kubernetes resource that allows you to store configuration data as key-value pairs. ConfigMaps are typically used to store non-sensitive configuration information that can be injected into containers as environment variables or mounted as files. They are commonly used for setting application configurations, environment variables, or properties.**
 
-### 2. Secret
+## 2. Secret
 
 **Sensitive Data** : This is data that when accessed can hurt us. This include passwords etc. 
 In k8s, this type of data is stored ina  different object called secret. 
@@ -168,7 +168,7 @@ This data is stored in Base64 encode format, and k8 will automatically translate
 This means you go to the base64 website, paste your password and base64 will give you characters that are equal to your password. Enter this in k8. For config-map, the data is stored in plain text. In k8s, we manage sensitive data using something called secret.
 
 **A Secret is another Kubernetes resource that stores sensitive or confidential data, such as passwords, API keys, and TLS certificates, as key-value pairs. Secrets are designed to keep sensitive data secure and are typically mounted as files or injected as environment variables into containers in a way that is more secure than ConfigMaps.**
-# Point to note
+### Point to note
 The k8 deployable file depends on the secret file but it needs some information such as environmental variables to deploy. In the secret file, we store all the secret data as environmental variables.
 For secret infor, only the **KEY** to the information will appear in the deployable file, and not the actual **VALUE** of the secret. The deployable file talks to the secret file to access the actual value.
 
@@ -201,3 +201,20 @@ We can see the the configmap with data 6. Meaning that there are 6 environmental
 We can also see that there is a secret object, with 5 environmental variables.
 
 We can also see the pod, and its ready and running. 
+
+## 3. Deployment file 
+This is a yaml file that is like the docker-compose file, it refers to the config map and the secret after they have been created (separately). This file collects the information from these dependant file (sec and cm), in order to create a pod. Therefore, ***the deployment gives birth to the pod***
+
+In order for the pod to be created, the configmap and secret have to be created or deployed before the deployment file is run. This is like building a car, the car cannot be driven before all the parts are put together, the driving comes last after all parts have been built and assembled together. 
+
+# 4. The Scheduler and Demon Set 
+Its in charge of pod scheduling. This tells where the pod will be created. Which node to create the pod. etc. 
+The scheduler assigns work (pods) to nodes based on resource requirements, constraints, and other policies. 
+The scheduler works like a human being, if the node has less pods, it will schedule all the new pods in the node with less pods. For example, if i have 6 nodes, below, the scheduler will put all pods in node 3 (red pods) as shpwn below. 
+
+Each pod to be scheduled is responsible for going to each node and collect the metrics of that node (CPU, Memoray, Storage and Logs) to the datacenter, in order to know its status and capability before any other pods are added. 
+
+
+However, if we rely on the scheduler to distribute these pods to collect the metrics, we cant get information of all nodes since pods will only be scheduled on nodes with less pods. 
+
+In order to solve this problem, we have to replicate the same pod to go to all nodes so that it collects the metrics. 
