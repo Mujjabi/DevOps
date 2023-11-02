@@ -12,4 +12,5 @@ This visualization emphasizes that the massive production of a given crop in a c
 
 This is, so far, my favorite visualization, not only because I am a crop science major but also because of the way the data was presented. They used plant icons to symbolize particular crops, which made the visualization easy to read. They also used different colors to distinguish between regions of origin, such as West Africa, southern Africa, North America, Northern Europe etc. Even though specific countries of origin are not pinpointed, the reader gets a general idea of where certain crops originated. Some of the fruits/crop icons were small and difficult to read, but a legend was provided to solve this issue. 
 
+
 ![Alt text](image-10.png)
