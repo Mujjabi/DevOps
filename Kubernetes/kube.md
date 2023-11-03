@@ -1,13 +1,28 @@
 # Kubernetes 
 Here is the link to the kubernetes [powerpoint](https://docs.google.com/presentation/d/1WxApP_IwQOfjdVjHrLKoOrlzZXwbWM4M/edit#slide=id.g142824cfa6a_1_26)
 
-### Container Orchestration tool
-it can scale, automate, deploy, contenizarize
+### K8s is a Container Orchestration tool
+Meaning that it can deploy, manage, scale up and down containers automatcally with no human intervention. 
+
 To orchestrate means it does everything, scaling, automating, deploying, and managing containerized applications. 
+## Compare Docker-Compose Vs k8s
+### Docker-Compose
+- Deploy multiple containers on a single virtual machine
+- You have to manually scale up or down containers when needed
+- Mostly used internally for development and testing area
+- Downtime expeted at deployment (kills a container before launching a new one, hence the application goes down during this waiting period)
+- lacks self-healing capacity
+### Kubernetes
+- Deploys containers (pods) on multiple virtual machines (nodes)
+- Automatically scales containers (pods)
+- Used in all areas (development,testing, pre-production, production)
+- Zero to near-sero downtime at deployment (starts a new container before killing one, helps the app to be running at all time)
+- High availability of application (autoscale gives high availability)
+- self healing (restarts containers if stopped)
 
 ## Components of K8
 We have 2 components:
-   - The master / control plae
+   - The master / control plane
    - The cluster / Node group
 The master controls the cluster.
 
@@ -226,9 +241,46 @@ The deamoset is also a file just like the the configmap and secret file. We dont
 Here we see datadog node agent pod on repeated or replicated at each one of the 3 nodes. Also, a kube-proxy is another type of a deamonset since it is a pod that is found in each node in the cluster. 
 
 
-## Cron Job in Kubernetes
+## Job & CronJob in Kubernetes
 
 From linux, we learnt that we can use cronjob to schedule repeated tasks in the future. For example, turn off or stop my instance every 10pm. In kubernetes, if i want to transfer data from pod (volume of the pod) to a datacenter to be safe in case a node is lost. we have the data safe in the datacenter. 
 
 In I.T, when an activity is done repetitively (from time to time) it is called a task. 
 ![Alt text](<WhatsApp Image 2023-11-01 at 23.44.47_f5b33d1c.jpg>)
+
+For example, I want to move data from this pod to a database at 9pm everyday, we set a cronjob. 
+We have 2 jobs.
+
+   1. Cronjob: Used for repeated tasks at specific time repeatitively.
+
+   2. Run to completion job (Job): This is used to run a task to completion and stop. 
+
+![Alt text](<WhatsApp Image 2023-11-02 at 00.11.56_c54e06d7.jpg>)
+
+Here we see that the job-thomisis ran once and never ran again, but cronjob kept running repeatitively. 
+
+## Replicaset for Reliability
+Pods are ephemeral - this means that they can die at any given point of time. This interferes with the high availability of the application because if the pod dies, the application will die.  If you are using the application on your phone and the pod dies, the app will crush. 
+![Alt text](<WhatsApp Image 2023-11-02 at 00.22.21_8665089d.jpg>)
+
+When you place a replicaset on the pod, which is a technology that gurantess that a specific number of pods running in our k8s cluster. 
+
+***Purpose:*** ReplicaSet is an object that maintains a set of identical pods to ensure a specified number of pod replicas are running at any given time.
+
+***Usage:*** It's used for stateless applications where maintaining a specific number of identical pods is essential for reliability and scaling. If a pod fails, the ReplicaSet replaces it to maintain the desired replica count.
+
+***Scaling:*** It ensures a specific number of replicas are running, irrespective of the number of nodes in the cluster.
+
+Since the replicaset ensures a specific number of pods, even when you delete a pod, k8s will automatically replace the deleted pod, to meet the required number of pods. The number of replicasets is defined in the deployment file under replica (number of pods). 
+
+If one pod dies, the application will not die, because k8s will automatically replace the pod. 
+
+# Service File
+An abstract way to expose an application running on a set of Pods  as a network service. Service helps to Make application visible on the browser.
+
+### Accessing the application on a browser.
+A service is a war to access the application. There are 3 ways of accessing the application in k8s. 
+1. The Nodeport
+2. Cluster IP
+3. Load balancer
+
