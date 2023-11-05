@@ -279,8 +279,111 @@ If one pod dies, the application will not die, because k8s will automatically re
 An abstract way to expose an application running on a set of Pods  as a network service. Service helps to Make application visible on the browser.
 
 ### Accessing the application on a browser.
-A service is a war to access the application. There are 3 ways of accessing the application in k8s. 
+A service is a war to access the application from the browser. There are 3 ways of accessing the application in k8s. 
 1. The Nodeport
 2. Cluster IP
 3. Load balancer
 
+The type of service is defined in the service yaml file under "spec" includding the port information.
+![Alt text](<WhatsApp Image 2023-11-04 at 15.04.40_30274ed8.jpg>)
+
+## Nodeport
+When you use a nodeport to expose the node, k8s will go on every single node, and open the same port. This port has 5 digits. If you have the IP addres of each node, you will see the application in the browser (IP address:portnumber). You can access every single node using the same port as long as you have hte node ip address. 
+**Port Range:** The NodePort is a port in the range of 30000-32767 by default. Users can also specify a port number in this range when defining the service. using the spec below in the service file. 
+```
+targetPort: 80
+nodeport:31000
+```
+Here k8s will assign this port number to as your nodeport number to all nodes. 
+
+K8 will deploy a service outside the nodes, and the service communicates with the nodes. 
+NodePort can provide rudimentary load balancing. This is because it exposes the service on each node, and external traffic can be balanced across these nodes.
+
+![Alt text](<WhatsApp Image 2023-11-04 at 15.13.20_4b82462a.jpg>)
+
+Forexample, we have 2 nodes running in our kubernetes cluster both supporting the same application. we can view list these nodes using the code below.
+```
+kubectl get node
+```
+Also, to view the service used to access these nodes, we use the command below.
+```
+kubectle get svc
+```
+This will return the follow results showing the nodeport as the service used, and the port that k8 created to access the application. Uisng this port together with the ip address of any of the nodes, you can acess the application in the browser.
+![Alt text](<WhatsApp Image 2023-11-05 at 07.43.58_cd64e6e0.jpg>)
+
+Below is the application we have running in the cluster accessed using the ip address of the node plus the nodeport number. 
+
+![Alt text](<WhatsApp Image 2023-11-05 at 07.42.23_2089848e.jpg>)
+
+## Load Balancer service 
+Comapared to nodeport where the service is placed inside the cluster and open a port on each node,for the load balancer, the cloud provider will provide an external service (service outside the cluster) that will manage the traffic between the nodes. 
+![Alt text](<WhatsApp Image 2023-11-05 at 08.00.53_5fe7444d.jpg>)
+
+If you administer K8s, you cannot have load balancer(unless you use metalLB), LB is only used if you consume k8s and is provided by the cloud provider (AWS etc). 
+
+MetalLB is a popular open-source load balancer designed for Kubernetes. MetalLB extends Kubernetes with a software load balancer to expose services within the cluster to external networks. Unlike cloud-based load balancers provided by cloud service providers, MetalLB is specifically tailored for on-premises or bare-metal Kubernetes installations where there isn't a cloud-specific load balancing solution available.
+
+To change the service from nodeport to LoadBalancer, we go back to our service yaml file and change the service type to *LoadBalancer*.
+After deploying, k8s will request for the LoadBalancer from the provider, this takes about 10 minutes since the balancer is provided externally. 
+
+![Alt text](<WhatsApp Image 2023-11-05 at 08.10.25_5ddd28ae.jpg>)
+
+When the loadbalancer is provided, you get an IP address of the Loadbalancer to access the application. You dont need to use the node IP address plus the port.
+![Alt text](<WhatsApp Image 2023-11-05 at 08.20.26_49924cb0.jpg>)
+
+In real life, companies only use nodeport for testing but in production, they use loadbalancer. 
+
+## Cluster IP
+If you dont want external access to the application, we use the service called cluster IP. The application is only accessible inside the cluster. If im not inside the cluster, you wont get a response when you  check network connectivity of the application using curl.
+```
+curl google.com
+```
+You can only access the application if you ssh into the pod as shown below. You have to list all the pods, then select the pod that you want to ssh into, use the kubectl exec -it command, after, curl the end point of that pod to see if you have connectivity.
+![Alt text](<WhatsApp Image 2023-11-05 at 09.00.18_c916f797.jpg>)
+
+Therefore, this shows that for nodeport and loadbalancer services, we can expose the cluster externally (external networks) while cluster IP we can only expose the application internally (inside the cluster)
+
+
+## What is the problem with the different service?
+**Nodeport**: The problem with the nodeport is the security. Since external individuals can directly access the cluster internally, its is prone to being hacked if someone is a goodhacker.
+
+**Loadbalancer**: The problem with the loadbalancer is that it is expensive since you need a new loadbalancer for each application you have in the cluster. You cannot use the same loadbalancer for all applications inside the cluster. And we are charged for every time someone accesses our application through the LB. If you have 50 applications, you will need 50 Lbs and its not cheap. 
+![Alt text](<WhatsApp Image 2023-11-05 at 09.23.39_637726a6.jpg>)
+
+## Solution: 
+Path based routing. The user is redirected to the part of the application they are looking for. 
+```
+Devopeasylearning/login
+Devopeasylearning/aboutus
+Devopeasylearning/career
+Devopeasylearning/contactus
+```
+![Alt text](<WhatsApp Image 2023-11-05 at 09.40.45_912e730e.jpg>)
+
+In the cluster above, we have 3 applications (food, movies, soccer) in the same cluster. We use path based routing to reroute users to the specific application that the user wants. **This is called redirectly the service to the backend**
+
+In cluster IP service, we can place another service called Ingress inside the clustr which can communicate or reroute the user to the specific application that they want without have access to the these nodes. 
+
+An Ingress in Kubernetes is not a service type but rather an API object used to manage external access to services within a Kubernetes cluster. It acts as a way to provide access to HTTP and HTTPS routes from outside the cluster to services running within the cluster.
+
+An Ingress typically works in conjunction with an Ingress Controller, which is responsible for implementing the rules specified in the Ingress resource. This controller is often a piece of software or a load balancer that interprets the Ingress rules and manages incoming traffic accordingly.The Ingress, typically through an Ingress Controller, manages external access to these services, including ClusterIP services, by defining rules for routing and directing traffic from outside the cluster to the appropriate internal services based on defined paths, hostnames, or other criteria specified in the Ingress resource.
+
+There are different ingress controllers ex Gloo.  Eric finds gloo as the easiest ingress to use. Go to gloo website and read how it works
+
+The virtual service, created in a file called vs.yaml is used to define the route.
+
+# NameSpace in the Cluster
+In order to control people working in the cluster, we create namepaces so that diferent people can access the k8s cluster depending on what you are doing. At work, the namespace is based on the application name. If I have 4 applications in the cluster (Costco, HD, Sam, HEB). The people (developers) working on each of the application will have access to the namespace that belongs to them and they can deploy and test their application.  
+![Alt text](<WhatsApp Image 2023-11-05 at 10.17.33_40fa5735.jpg>)
+
+Do not go to other people's namespace and mess-up things. 
+
+If you have an application to change or add a feature, you can create your own namespace, copy the app in your own namespace, add the feature, test it in your own namespace, if its working, then u can transfer it to the communal namespace for that application.
+
+## Create namespace
+```
+kubectl create ns chris
+
+kubens chris  - #this locks you inside your namespace
+```
