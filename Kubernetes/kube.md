@@ -432,9 +432,11 @@ The livenessProbe is set to perform an HTTP GET request to /healthz on port 80 e
 
 - **Startup Probe:(introduced in Kubernetes 1.16):** This probe is specifically designed to determine when a container is ready to start accepting traffic. It runs during the initial startup of a container.
 
+# Volumes
 
-# Storage Class, Persistent Volume (PV) and PV Claim
+## Storage Class, Persistent Volume (PV) and PV Claim
 In Kubernetes, StorageClass, PersistentVolume (PV), and PersistentVolumeClaim (PVC) are components used to manage and provision persistent storage for applications running in a cluster.
+It creates a temporary, empty storage space for the lifetime of a pod. It's useful for sharing files between containers in the same pod but should not be relied upon for persistent data as it gets wiped out when the pod restarts or is rescheduled.
 
 ![Alt text](image-10.png)
 
@@ -485,14 +487,15 @@ spec:
   storageClassName: fast
 
 ```
-
-## Dynamic Provisioning
+             
+### Dynamic Provisioning
 This is the storage class that is outside the cluster. (EBS - Elastic Bloc storage) is an example of volume or storage outside the cluster. This helps us to expand on our original storage class. This is the persistent volume. We cant afford to lose this volume because it stores all the important data. 
+It involves dynamically creating PersistentVolumes based on PersistentVolumeClaim specifications, utilizing StorageClasses.
+
+### Hostpath
+The volume inside the node. This will die if the node dies. We can cop with it being lost. It allows mounting specific paths from the host node's filesystem into the pod, but it has limitations in terms of portability and reliability.
 
 
-## Hostpath
-The volume inside the node. This will die if the node dies. 
+### EmptyDir
+This is the volume inside your pod or mounted on the pod. If the pod dies, it dies it this volume. we dont give a damn. It creates a temporary, empty storage space for the lifetime of a pod. It's useful for sharing files between containers in the same pod but should not be relied upon for persistent data as it gets wiped out when the pod restarts or is rescheduled.
 
-
-## EmptyDir
-This is the volume inside your pod or mounted on the pod. If the pod dies, it dies it this volume. 
