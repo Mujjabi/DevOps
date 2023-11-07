@@ -433,47 +433,63 @@ The livenessProbe is set to perform an HTTP GET request to /healthz on port 80 e
 - **Startup Probe:(introduced in Kubernetes 1.16):** This probe is specifically designed to determine when a container is ready to start accepting traffic. It runs during the initial startup of a container.
 
 # Volumes
+This [Article](https://blog.devops.dev/volumes-in-kubernetes-8e042c6c400e) explains it very well. 
 
 ## Storage Class, Persistent Volume (PV) and PV Claim
 In Kubernetes, StorageClass, PersistentVolume (PV), and PersistentVolumeClaim (PVC) are components used to manage and provision persistent storage for applications running in a cluster.
-It creates a temporary, empty storage space for the lifetime of a pod. It's useful for sharing files between containers in the same pod but should not be relied upon for persistent data as it gets wiped out when the pod restarts or is rescheduled.
+
+### Dynamic Provisioning
+This is the storage class that is outside the cluster. *Aws-ebs* (EBS - Elastic Block storage) is an example of volume or storage outside the cluster. This helps us to expand on our original storage class. This is the persistent volume. We cant afford to lose this volume because it stores all the important data. 
+It involves dynamically creating PersistentVolumes based on PersistentVolumeClaim specifications, utilizing StorageClasses.
+
+### Storage Class
+StorageClass is a Kubernetes resource that defines the properties of a dynamically provisioned persistent volume. It allows you to create different types of PersistentVolumes with different performance, capacity, and availability characteristics, based on the requirements of your applications.
+
+Using StorageClasses, you can define storage profiles for different types of workloads, and automatically provision storage resources on demand. This makes it easier to manage and scale storage in a Kubernetes environment and provides a consistent storage experience for your applications.
+
+### Persistent Volume
+Persistent volume (PV) is a type of volume in Kubernetes that allows you to store data beyond the lifetime of a pod. A PV is a cluster-wide resource that provides an abstract layer between the underlying storage and the applications that use it. This allows you to separate the details of the underlying storage from the applications that use it, making it easier to manage storage in a Kubernetes environment.
+
+To use a PersistentVolume, you first need to provide a storage resource in your Kubernetes cluster. This can be done using a number of different storage providers, such as cloud-based storage services or on-premises storage solutions. Once the storage resource has been provisioned, you can create a PersistentVolume object in Kubernetes that represents the storage resource.
+
+### PersistentVolumeClaim (PVC)
+In Kubernetes, a PersistentVolumeClaim (PVC) is a request for a specific amount of storage by a user or a pod. A PVC can be used to request a specific storage class, access mode, and size of storage. Once a PVC is created, Kubernetes tries to match the request with a persistent volume (PV) that has the desired characteristics.
+
+When a PVC is created, it requests a specific amount of storage, a StorageClass, and an access mode. The access mode specifies how the storage can be used, such as ReadWriteOnce (can be used by a single node at a time) or ReadWriteMany (can be used by multiple nodes simultaneously).
 
 ![Alt text](image-10.png)
 
-
+Here is an example of all the volumes. 
 
 ```
----
-# StorageClass
+## StorageClass
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: fast
-provisioner: some-provisioner
+provisioner: kubernetes.io/aws-ebs
 parameters:
-  type: fast
-  storage: 10Gi
-allowVolumeExpansion: true
+  type: gp2
+  zone: us-west-2a
+reclaimPolicy: Retain
 
----
-# PersistentVolume
+
+##PersistentVolume
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: my-pv
 spec:
   capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
+    storage: 1Gi
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: fast
+  storageClassName: standard
   hostPath:
-    path: /data/example
+    path: /mnt/data
 
----
-# PersistentVolumeClaim
+## PersistentVolumeClaim
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -483,19 +499,77 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 3Gi
+      storage: 1Gi
   storageClassName: fast
-
 ```
              
-### Dynamic Provisioning
-This is the storage class that is outside the cluster. (EBS - Elastic Bloc storage) is an example of volume or storage outside the cluster. This helps us to expand on our original storage class. This is the persistent volume. We cant afford to lose this volume because it stores all the important data. 
-It involves dynamically creating PersistentVolumes based on PersistentVolumeClaim specifications, utilizing StorageClasses.
+## Other Volumes 
 
 ### Hostpath
 The volume inside the node. This will die if the node dies. We can cop with it being lost. It allows mounting specific paths from the host node's filesystem into the pod, but it has limitations in terms of portability and reliability.
 
+**Differences between HostPath and PV volume**
+HostPath Volume:
+
+Usage: A hostPath volume mounts a file or directory from the host node's filesystem directly into the pod. It allows a pod to use the host node's local file system as a volume.
+
+Scope: The hostPath volume is specific to the node where the pod is scheduled. If the pod is rescheduled to a different node, it won't have access to the original hostPath.
+
+Portability: It's not suitable for production environments because it binds the pod to a specific node, limiting portability and making it difficult to move the pod across nodes. This approach could result in difficulties in scaling and maintaining high availability.
+
+Usage Caution: The hostPath should be used carefully, as it bypasses the volume plugins and potentially exposes the host's filesystem directly into the container, potentially causing security risks.
+
+PersistentVolume (PV):
+
+Purpose: PersistentVolumes are an abstraction of networked storage in Kubernetes, providing a way for users to claim durable, persistent storage for their workloads. PVs are separate from the pod lifecycle.
+
+Dynamic Provisioning: PVs can be dynamically provisioned based on PersistentVolumeClaim (PVC) requests, especially when coupled with a StorageClass. If the cluster has the appropriate storage plugin and configurations, PVs can be dynamically created to satisfy the demands of PVCs.
+
+Portability: PVs are not bound to a specific node and can be used by any pod within the cluster (given proper access rights). They are more portable than hostPath volumes as they are independent of the underlying nodes.
+
+Abstraction Layer: PVs provide an abstraction layer, allowing administrators to manage and provision storage that can be used by different pods. They can be provisioned from different types of storage systems (like cloud-based storage, networked storage solutions, etc.) using the specified storage classes.
+
+In summary, while both hostPath and PV offer storage solutions for Kubernetes workloads, hostPath is node-specific and generally used for development or testing purposes, while PVs are more versatile, persistent, and suited for production workloads as they offer dynamic provisioning, portability, and can be managed centrally within the cluster.
 
 ### EmptyDir
 This is the volume inside your pod or mounted on the pod. If the pod dies, it dies it this volume. we dont give a damn. It creates a temporary, empty storage space for the lifetime of a pod. It's useful for sharing files between containers in the same pod but should not be relied upon for persistent data as it gets wiped out when the pod restarts or is rescheduled.
 
+```
+## EmptyDIR
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: container-1
+      image: my-image
+      volumeMounts:
+        - name: my-volume
+          mountPath: /data
+    - name: container-2
+      image: my-other-image
+      volumeMounts:
+        - name: my-volume
+          mountPath: /data
+  volumes:
+    - name: my-volume
+      emptyDir: {}
+
+## HostPath
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: my-container
+    image: my-image
+    volumeMounts:
+    - name: hostpath-volume
+      mountPath: /path/on/container
+  volumes:
+  - name: hostpath-volume
+    hostPath:
+      path: /path/on/host
+```
