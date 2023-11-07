@@ -364,6 +364,8 @@ Devopeasylearning/contactus
 In the cluster above, we have 3 applications (food, movies, soccer) in the same cluster. We use path based routing to reroute users to the specific application that the user wants. **This is called redirectly the service to the backend**
 
 In cluster IP service, we can place another service called Ingress inside the clustr which can communicate or reroute the user to the specific application that they want without have access to the these nodes. 
+# Ingress
+an Ingress is an object that allows access to your Kubernetes services from outside the Kubernetes cluster. You configure access by creating a collection of rules that define which inbound connections reach which services.
 
 An Ingress in Kubernetes is not a service type but rather an API object used to manage external access to services within a Kubernetes cluster. It acts as a way to provide access to HTTP and HTTPS routes from outside the cluster to services running within the cluster.
 
@@ -387,3 +389,110 @@ kubectl create ns chris
 
 kubens chris  - #this locks you inside your namespace
 ```
+# K8S Probes
+There are three types of probes used in Kubernetes. These probes help Kubernetes manage and maintain the health and availability of your application by monitoring and acting upon the specified conditions. This is the only devops opportunity to control or figure out if the application is running.
+
+- **Liveness Probe:**
+  This probe is used to determine if the container is running properly. Running means the container is alive. If the liveness probe fails, Kubernetes can take defined actions, such as restarting the container.
+  In Kubernetes, a liveness probe is a mechanism used to determine if a container within a pod is healthy and running as expected. It is a critical part of ensuring the reliability and availability of applications deployed in Kubernetes.
+  
+  The liveness probe is configured as part of the pod's specification and is used to periodically check the health of a container by performing a specified check. If the check fails, Kubernetes takes action based on how the probe is configured.
+
+  The liveness probe specifically focuses on ensuring that the container is operating as expected. It performs periodic checks on the container by making HTTP requests, running commands inside the container, or simply checking a TCP socket. If the probe fails, Kubernetes can restart the container to attempt recovery
+
+
+- **Readiness Probe:** Ready means that the container is ready to accept  requests. This probe determines if the container is ready to serve traffic. If the readiness probe fails, the container is removed from the service endpoints until it passes the readiness check.
+The readiness probe is essential for signaling when a container is ready to serve traffic. 
+If the readiness probe fails, Kubernetes won't direct traffic to the container until it passes the readiness check. Conversely, the liveness probe focuses on ensuring the container is running correctly and takes actions like restarting the container if it fails.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+spec:
+  containers:
+  - name: example-container
+    image: nginx
+    livenessProbe: 
+      httpGet:
+        path: /healthz
+        port: 80
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: 80
+      initialDelaySeconds: 20
+      periodSeconds: 5
+
+```
+The livenessProbe is set to perform an HTTP GET request to /healthz on port 80 every 10 seconds after an initial delay of 15 seconds. The readinessProbe is set to perform an HTTP GET request to /readyz on port 80 every 5 seconds after an initial delay of 20 seconds.
+
+- **Startup Probe:(introduced in Kubernetes 1.16):** This probe is specifically designed to determine when a container is ready to start accepting traffic. It runs during the initial startup of a container.
+
+
+# Storage Class, Persistent Volume (PV) and PV Claim
+In Kubernetes, StorageClass, PersistentVolume (PV), and PersistentVolumeClaim (PVC) are components used to manage and provision persistent storage for applications running in a cluster.
+
+![Alt text](image-10.png)
+
+
+
+```
+---
+# StorageClass
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: some-provisioner
+parameters:
+  type: fast
+  storage: 10Gi
+allowVolumeExpansion: true
+
+---
+# PersistentVolume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: fast
+  hostPath:
+    path: /data/example
+
+---
+# PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+  storageClassName: fast
+
+```
+
+## Dynamic Provisioning
+This is the storage class that is outside the cluster. (EBS - Elastic Bloc storage) is an example of volume or storage outside the cluster. This helps us to expand on our original storage class. This is the persistent volume. We cant afford to lose this volume because it stores all the important data. 
+
+
+## Hostpath
+The volume inside the node. This will die if the node dies. 
+
+
+## EmptyDir
+This is the volume inside your pod or mounted on the pod. If the pod dies, it dies it this volume. 
