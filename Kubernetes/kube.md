@@ -1,6 +1,10 @@
 # Kubernetes 
 Here is the link to the kubernetes [powerpoint](https://docs.google.com/presentation/d/1WxApP_IwQOfjdVjHrLKoOrlzZXwbWM4M/edit#slide=id.g142824cfa6a_1_26)
 
+### upgrading k8s
+You cant upgrade k8s from one version to another skipping versions. Forexample from 1.26 to 1.28. You need to go one version at a time. From 1.26, to can only go to 1.27. Also, you cant go back to old versions if you upgrade.
+
+
 ### K8s is a Container Orchestration tool
 Meaning that it can deploy, manage, scale up and down containers automatcally with no human intervention. 
 
@@ -573,3 +577,83 @@ spec:
     hostPath:
       path: /path/on/host
 ```
+# Deployment
+
+
+
+# Statefulset
+In statefulset, if you see status *"pending"*, 99% of the times you are dealing with a volume issue.
+
+Pod not running (status pending) showing this error. This is a database error. 
+```
+volumeMounts:
+    - name: postgress-storage
+      mountPath: /var/lib/postgressql/data
+```
+
+```
+initdb: error: directory "/var/lib/postgresql/data" exists but is not empty
+initdb: detail: It contains a lost+found directory, perhaps due to it being a mount point.
+initdb: hint: Using a mount point directly as the data directory is not recommended.
+```
+This is how you solve it. k8s expects this directory (/var/lib/postgressql/data) to be empty, but it is not. Therefore, youu create another one as shown below. 
+```
+volumeMounts:
+    - name: postgress-storage
+      mountPath: /var/lib/postgressql/data-data
+```
+
+
+# Replicaset
+
+
+
+### Access Modes
+In Kubernetes, "Access Modes" define how a PersistentVolume (PV) can be accessed by a pod. These access modes describe the different ways in which a volume can be mounted to the nodes.
+
+There are three primary access modes for PersistentVolumes:
+
+**ReadWriteOnce (RWO):**
+
+Allows the volume to be mounted as read-write by a single node.
+It means that the volume can be mounted as read-write by only one node in the cluster. It's suitable for scenarios where the volume needs to be writable by a single node at a time.
+
+**ReadOnlyMany (ROX):**
+
+Allows the volume to be mounted as read-only by many nodes.
+It means that the volume can be mounted as read-only by multiple nodes concurrently. It's suitable for scenarios where the volume needs to be read by multiple nodes but not written to.
+
+**ReadWriteMany (RWX):**
+
+Allows the volume to be mounted as read-write by many nodes.
+It means that the volume can be mounted as read-write by multiple nodes concurrently. It's suitable for scenarios where the volume needs to be both readable and writable by multiple nodes.
+When defining a PersistentVolume or a PersistentVolumeClaim in Kubernetes, you specify the access mode that your application requires. The volume requested in a PersistentVolumeClaim must have an access mode that is compatible with the mode specified in the PVC.
+
+```
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: example-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: fast
+
+```
+In this example, the access mode specified for the PersistentVolumeClaim (example-pvc) is ReadWriteOnce, indicating that it requires the associated storage to be mounted as read-write by a single node at a time. Adjust the access mode according to your application's requirements when creating a PersistentVolume or PersistentVolumeClaim.
+
+## Service account vs User Account
+
+K8s always creates a service account by default for each namespace created.
+```
+kubectl create ns chris
+kubectl get sa -n chris
+
+kubectl describe sa chris #
+```
+When you upgrade from 1.24 to above, the service account tokens are lost, and your app will crash coz automation wont access API. You need to regenerate tokens. 
+
+If you are asked to upgrade the k8s cluster, you need to research all the changes that have taken place from one last version. There is a lot of changes, that might screw up all processes.
