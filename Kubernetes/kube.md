@@ -657,3 +657,5 @@ kubectl describe sa chris #
 When you upgrade from 1.24 to above, the service account tokens are lost, and your app will crash coz automation wont access API. You need to regenerate tokens. 
 
 If you are asked to upgrade the k8s cluster, you need to research all the changes that have taken place from one last version. There is a lot of changes, that might screw up all processes.
+
+##what is being upgraded if we upgrade the cluster?
