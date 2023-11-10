@@ -365,9 +365,10 @@ Devopeasylearning/contactus
 ```
 ![Alt text](<WhatsApp Image 2023-11-05 at 09.40.45_912e730e.jpg>)
 
-In the cluster above, we have 3 applications (food, movies, soccer) in the same cluster. We use path based routing to reroute users to the specific application that the user wants. **This is called redirectly the service to the backend**
+In the cluster above, we have 3 applications (food, movies, soccer) in the same cluster. We use path based routing to reroute users to the specific application that the user wants. **This is called redirecting the service to the backend**
 
 In cluster IP service, we can place another service called Ingress inside the clustr which can communicate or reroute the user to the specific application that they want without have access to the these nodes. 
+
 # Ingress
 an Ingress is an object that allows access to your Kubernetes services from outside the Kubernetes cluster. You configure access by creating a collection of rules that define which inbound connections reach which services.
 
@@ -442,7 +443,7 @@ This [Article](https://blog.devops.dev/volumes-in-kubernetes-8e042c6c400e) expla
 ## Storage Class, Persistent Volume (PV) and PV Claim
 In Kubernetes, StorageClass, PersistentVolume (PV), and PersistentVolumeClaim (PVC) are components used to manage and provision persistent storage for applications running in a cluster.
 
-### Dynamic Provisioning
+### Dynamic Provisioning  Vs Static Provisioning
 This is the storage class that is outside the cluster. *Aws-ebs* (EBS - Elastic Block storage) is an example of volume or storage outside the cluster. This helps us to expand on our original storage class. This is the persistent volume. We cant afford to lose this volume because it stores all the important data. 
 It involves dynamically creating PersistentVolumes based on PersistentVolumeClaim specifications, utilizing StorageClasses.
 
