@@ -660,3 +660,21 @@ When you upgrade from 1.24 to above, the service account tokens are lost, and yo
 If you are asked to upgrade the k8s cluster, you need to research all the changes that have taken place from one last version. There is a lot of changes, that might screw up all processes.
 
 ##what is being upgraded if we upgrade the cluster?
+
+
+
+## Pod Disruption Budget
+This is a manifest used to prevent deleting pods hence mantaining the minimum number of pods running. This is done by setting the maximum number of pods unavailable to 1. 
+
+```
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: example-pdb
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: your-app-label
+```
+

@@ -27,3 +27,14 @@ s6jbaafi          Active   9d
 s6nic             Active   9d
 s6oluwafunmilay   Active   9d
 ```
+  -  Checking details on the pods, includes all infor
+```
+kubectl get pod -owide
+```
+ - Checking / describing the services 
+```
+kubectl describe svc thomisis
+```
+```
+kubectl get svc -A
+```
