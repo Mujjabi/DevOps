@@ -578,11 +578,18 @@ spec:
     hostPath:
       path: /path/on/host
 ```
-# Deployment
+# Deployment vs Statefulset
+
+Both Deployments and StatefulSets are Kubernetes controllers used to manage the deployment and scaling of applications, but they are designed for different use cases and have some key differences:
+
+We use Deployments for stateless applications that can scale horizontally, and where pods can be treated as interchangeable instances.
+
+While StatefulSets is used for stateful applications that require stable network identities and persistent storage, and where the order of pod creation and scaling is important.
+
+Choosing between Deployments and StatefulSets depends on the characteristics of your application and its requirements regarding identity, storage, and ordering of pods during deployment and scaling.
 
 
 
-# Statefulset
 In statefulset, if you see status *"pending"*, 99% of the times you are dealing with a volume issue.
 
 Pod not running (status pending) showing this error. This is a database error. 
@@ -606,6 +613,8 @@ volumeMounts:
 
 
 # Replicaset
+
+This is set in the deployment manifest by showing how many pod replications we want running at a time. 
 
 
 
@@ -648,6 +657,20 @@ In this example, the access mode specified for the PersistentVolumeClaim (exampl
 
 ## Service account vs User Account
 
+In Kubernetes, a Service Account is an identity that a pod can use to interact with the Kubernetes API server and other resources within the cluster. Every pod in a Kubernetes cluster is associated with a Service Account, and this association determines the permissions and access levels that the pod has.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  serviceAccountName: myserviceaccount
+  containers:
+  - name: mycontainer
+    image: myimage
+
+```
 K8s always creates a service account by default for each namespace created.
 ```
 kubectl create ns chris
@@ -678,3 +701,104 @@ spec:
       app: your-app-label
 ```
 
+## AutoScaling 
+### Horizontal Pod Autoscaling
+This is used to scale up or down the cluster automatically. When we have high traffic, the hPa helps to create more pods if necessary and kill pods if not needed. 
+
+Horizontal Pod Autoscaling (HPA) is a feature in Kubernetes that automatically adjusts the number of running pods in a deployment or replica set based on observed CPU utilization or other custom metrics. The goal is to ensure optimal performance and resource utilization in response to varying workloads.
+
+The hpa overrides the replica set if more pods are needed.
+
+```
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: example-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: example-deployment
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu   #this is what is observed, it can also be memory.
+      target:
+        type: Utilization
+        averageUtilization: 50 #if cpu usage goes above 50, create more pods
+```
+
+## Pod Phases
+ If your pod is not in any of these states, there is a problem
+ ```
+ Running
+
+ Succeeded
+
+ Completed
+ ```
+
+ Some of the issues are due to the reasons below
+
+ 1. Pending -----> Volume issue
+ 2. Crashbackloop ------> liveness/readiness or applicaton code error
+ 3. creationconfigerror -----> missing configmap/secret
+ 4. ErrorImagePull -------> missing images on a registry or missing required permission to pull the images 
+ 5. Error ---------> configuration of the pod itself most of the time, but not all the time
+
+ # PERMISSION IN K8S
+ We have 2 types of user in K8s. Human user and service user (Programatic user). We have different permissions for each of the 2 users. 
+
+### Types of permissions:
+- get
+- watch
+- delete
+- list
+
+
+ We give permission at 2 levels;
+ 1. Namespace level
+ 2. At the cluster level
+
+ If you are given permission at ns level it means that the user can only use these permissions at the namepsace level. 
+
+ When you have permission at the cluster level, you can access all namespaces in the cluster. 
+
+In k8s manifest, we create the *Role* where we define which roles to be followed, and we created a *Rolebinding* where we list the users whoe need to follow those roles. 
+
+```
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: myserviceaccount
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: s6    
+  name: podreader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]  #resource thats targeted. 
+  verbs: ["get", "list", "watch"]  #everyone assigned to this role will be able to do these roles to the pod 
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: myrolebinding
+subjects:
+- kind: ServiceAccount
+  name: Christopher  #this is the user thats binded to the role.
+roleRef: 
+  kind: Role
+  name: podreader #this is the role we created earlier. 
+  apiGroup: rbac.authorization.k8s.io
+
+```
+### Cluster Level
