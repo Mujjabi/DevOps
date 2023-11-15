@@ -748,7 +748,14 @@ spec:
  4. ErrorImagePull -------> missing images on a registry or missing required permission to pull the images 
  5. Error ---------> configuration of the pod itself most of the time, but not all the time
 
- # PERMISSION IN K8S
+ # Role-Based Access Control (RBAC) (Permission)
+
+ Role-Based Access Control (RBAC) is used to control access and permissions within the cluster. 
+ 
+ It allows you to define roles with specific permissions and bind those roles to users, groups, or service accounts using RoleBindings or ClusterRoleBindings. 
+
+ The roles can be assigned to human users or programatic user in the service account.
+
  We have 2 types of user in K8s. Human user and service user (Programatic user). We have different permissions for each of the 2 users. 
 
 ### Types of permissions:
@@ -762,43 +769,111 @@ spec:
  1. Namespace level
  2. At the cluster level
 
+### Namespace level
  If you are given permission at ns level it means that the user can only use these permissions at the namepsace level. 
 
  When you have permission at the cluster level, you can access all namespaces in the cluster. 
 
 In k8s manifest, we create the *Role* where we define which roles to be followed, and we created a *Rolebinding* where we list the users whoe need to follow those roles. 
 
+### Cluster Level
+**ClusterRole:** Defines a set of permissions that can be applied cluster-wide. In this example, a ClusterRole named cluster-role-example is created, granting permissions to list, get, and watch pods across all namespaces.
+
+**ClusterRoleBinding:** Binds a ClusterRole to a user, group, or service account across the entire cluster. In this example, a ClusterRoleBinding named cluster-role-binding-example associates the cluster-role-example ClusterRole with a ServiceAccount named your-service-account in the namespace your-namespace
+
 ```
-apiVersion: v1
-kind: ServiceAccount
+# ClusterRole definition
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
-  name: myserviceaccount
+  name: cluster-role-example
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
 
 ---
 
+# Role definition in a specific namespace
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: s6    
-  name: podreader
+  name: namespace-role-example
+  namespace: your-namespace
 rules:
 - apiGroups: [""]
-  resources: ["pods"]  #resource thats targeted. 
-  verbs: ["get", "list", "watch"]  #everyone assigned to this role will be able to do these roles to the pod 
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
 
 ---
 
+# ClusterRoleBinding to associate ClusterRole with a ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-role-binding-example
+subjects:
+- kind: ServiceAccount
+  name: your-service-account
+  namespace: your-namespace
+roleRef:
+  kind: ClusterRole
+  name: cluster-role-example
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+# RoleBinding to associate Role with a ServiceAccount in a specific namespace
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: myrolebinding
+  name: namespace-role-binding-example
+  namespace: your-namespace
 subjects:
 - kind: ServiceAccount
-  name: Christopher  #this is the user thats binded to the role.
-roleRef: 
+  name: your-service-account
+  namespace: your-namespace
+roleRef:
   kind: Role
-  name: podreader #this is the role we created earlier. 
+  name: namespace-role-example
   apiGroup: rbac.authorization.k8s.io
+```
+## Init Containers
+In Kubernetes, an Init Container is a separate container that runs before the main application container in a Pod. 
+
+The primary purpose of an Init Container is to perform initialization tasks or setup tasks required by the application before the main container starts.
+
+Init containers are exactly like regular containers, except: Init containers always run to completion.
+
+**Order of Execution:** Init Containers are executed in order, one at a time, and each Init Container must complete successfully before the next one starts.
+
+**Use Cases:** Common use cases for Init Containers include downloading and extracting data, pre-populating a cache, or waiting for a database to be ready before starting the main application.
+
+**Separation from Main Container:** Init Containers are separate from the main application container, allowing you to keep the application container focused on the core functionality.
+
+**Pod Status:** The status of the Init Containers affects the overall status of the Pod. If any Init Container fails, the Pod will not be considered ready until the issue is resolved.
 
 ```
-### Cluster Level
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: main-container
+    image: myapp:latest
+  initContainers:
+  - name: init-container-1
+    image: busybox:latest
+    command: ['sh', '-c', 'echo "Initialization complete." && exit 0']
+  - name: init-container-2
+    image: alpine:latest
+    command: ['sh', '-c', 'echo "Second Initialization complete." && exit 0']
+```
+To view the logs of the init containers, we use the commans below
+
+```
+kubectl logs mypod -c init-container-1
+kubectl logs mypod -c init-container-2
+```
+
