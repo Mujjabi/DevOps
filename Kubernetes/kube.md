@@ -1096,5 +1096,33 @@ This command is used to safely evict all the Pods from a node before taking it o
 If your maintance will affect the functioning of the pods on the node, you need to drain the pods. 
 
 
+## Labels
+Kubernetes, a "label" is a key-value pair that is attached to Kubernetes objects such as Pods, Services, Deployments, and Nodes. Labels are used to identify, organize, and select objects within the Kubernetes system.
+
+In the cluster, you may have multiple applications. Each application has its own resources or objects. You might have 4 config maps if u have 4 applications, but each configmap will be attached to its corresponding app. 
+
+selector match label means select or you call all object that matches this label. 
 
 
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+```
+
+For example, in k8s the service (exposes the pod) is placed infront of the pod in the node. If you deploy a service manifest, k8s needs to know which pod to deploy the service to. This uses the matching label of the app to idenfy which pod has that particular app in that node.
+
+Another example, the deployment.yaml doesnt mention the service anywhere. But k8s will know which service to use for a particular deployment manifest using the match label of the app being deployed, that is mentioned in both manifests. 
+
+### Kyverno:
+Some companies install this program called kyverno to impede anyone to deploy anything without a label. 
