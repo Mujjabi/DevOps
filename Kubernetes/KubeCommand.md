@@ -59,3 +59,23 @@ kubectl apply -f path/to/your-manifest.yaml
 kubectl api-resources | grep deployment
 
 ```
+## kubectl get 
+This list whatever object you want to inspect. You can list as many objects/resource using the comma
+```
+kubectl get cm, sv, pod -owide
+```
+
+## Kubectl describe
+This gives details of the pod
+
+## kubectl log
+This gets the logs of the pods
+
+## kubectl exec [pod] 
+This is to ssh into a pod
+
+## kubectl scale
+This can scale a pod. Forexample, increasing the replicas, you can do this. 
+```
+kubectl scale deployment <deployment-name> --replicas=3
+```

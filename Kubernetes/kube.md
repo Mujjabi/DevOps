@@ -947,7 +947,7 @@ metadata:
 ### Spec:
 These are anything that can change the behavoir of the pod will go in the spec. Eg, replicaset, etc.
 
-1. Resources:
+#### 1. Resources:
 The resource typically refers to the compute resources that are allocated to a container within a pod. These compute resources include CPU and memory.
 
 These resources come from the node, since the pod is inside the node. This section . we ***request*** helps make the neccesary resources (memory and cpu) needed for the pod to run and also set a ***limit*** so tha the pod doesnt overuse the resource from the node. 
@@ -970,7 +970,12 @@ spec:
 
 ```
 
-2. Volume mount:
+####  2. Volume mount:
+
+This field allows you to mount volumes into the container. You specify a list of volume mounts, each with a name referencing a volume defined in the volumes section, and a mountPath specifying the path in the container's filesystem where the volume should be mounted.
+
+####  3. Volume:
+This section defines the volumes that can be mounted into the pod. In this example, a volume named myvolume is defined as an empty directory (emptyDir). Volumes must be defined at the pod level, outside of the containers section.
 
 ```
 spec:
@@ -985,7 +990,8 @@ spec:
       emptyDir: {}
 
 ```
-3. Imagepullpolicy and Image pull secret.
+
+####  4. Imagepullpolicy and Image pull secret.
 
 The imagePullPolicy and imagePullSecrets are additional configurations under the spec section of a container in a Kubernetes manifest. 
 ```
@@ -1015,5 +1021,80 @@ spec:
 
 If changes are made on the original image and pushed to dockerhub, the "ifpresent" and "never" options cant pull the new updates, therefore its better to set it to "always".
 
+If you have a specific image that you never want to change because of the configs that you set in it, then use "never". 
 
-imagePullSecrets is used to specify credentials for pulling private container images from a registry. It references a secret that contains the required authentication information. In this example, a secret named myregistrysecret is specified.
+
+2. imagePullSecrets is used to specify credentials for pulling private container images from a registry. 
+It references a secret that contains the required authentication information. In this example, a secret named myregistrysecret is specified.
+NB: Watch video on 11/21/2023, shows how credential (token) was created and image pulled from a private registry.
+
+## Taiting the pod
+In Kubernetes (K8s), "Pod Tainting" refers to a mechanism used to influence the scheduling of Pods onto nodes in a cluster. Taints are applied to nodes, and then Pods can tolerate or not tolerate those taints. This is a way to control which nodes can or cannot run specific Pods, helping to ensure certain conditions or requirements are met.
+
+**Taints:** Is a key-value pair associated with a node in the cluster.
+It represents a constraint on which Pods are allowed to run on the node.
+Taints can be added to a node, specifying that certain conditions must be met for a Pod to be scheduled onto that node.
+
+**Tolerations:** Tolerations are properties of Pods that indicate they can tolerate (or ignore) the specified taints.
+When a Pod has a toleration that matches a node's taint, the scheduler can place the Pod on that node.
+
+**Effect:** Taints have an "effect" attribute, which can be one of three values: NoSchedule, PreferNoSchedule, or NoExecute.
+```
+NoSchedule: 
+The Pod will not be scheduled onto the node unless it has a matching toleration.
+
+PreferNoSchedule: 
+The scheduler will try to avoid placing the Pod on the node if possible, but it is not a strict rule.
+
+NoExecute: 
+Existing Pods on the node th
+```
+
+
+
+## Misbehaving Nodes
+2 things you can do. 
+
+1. cordon the node.
+
+This puts the node out of schedule(unschedule) so that the scheduler doesnt assign any pods in that node. To bring this node back to schedule, you have to uncordon. 
+
+```
+kubectl get node  #this will show normal nodes ready for pod scheduling
+kubectl cordon node [node name]
+kubectl get node # this will show node is out of scheduling
+
+```
+If any pods are scheduled when this node is still unscheduled or before its uncordoned, all the new pods will be scheduled on other nodes. 
+When its fixed, its uncordoned, and it will be ready to accept pods.
+
+```
+kubectl uncordon node [node name]
+```
+
+2. Drain the node
+
+When you drain the node, you also unshedule the node. To bring this node back to schedule, you have to uncordon. 
+```
+kubectl drain --ignore-daemonsets [node name]
+```
+This command would evict all non-DaemonSet Pods from the specified node, allowing you to perform maintenance activities without affecting critical system processes managed by DaemonSets.
+
+Draining the node evicts the pods in that node and gets it ready for mantainance, but the evicted pods are recreated in other functional nodes as this one is being repaired.
+
+Why do we ignore daemonset?
+
+#### Difference between cordon and drain?
+kubectl cordon and kubectl drain are both used when you need to perform maintenance or take a node out of service for some reason in a Kubernetes cluster.
+
+1. Cordon
+This command is used to mark a node as unschedulable. It prevents new Pods from being scheduled onto the node. It's typically used when you want to prevent new workloads from being assigned to a node, but you don't want to disturb the existing Pods running on that node. If your mantainance wont affect the functioning of the existing pods, you can cordon the node. This just stops scheduling more pods but wont affect the functionality of the existing pods. 
+
+2. Drain:
+
+This command is used to safely evict all the Pods from a node before taking it offline for maintenance. It cordons the node first (makes it unschedulable) and then evicts the Pods. The --ignore-daemonsets flag is often used with kubectl drain to ensure that DaemonSet Pods (which are intended to run on all nodes) are not evicted.
+If your maintance will affect the functioning of the pods on the node, you need to drain the pods. 
+
+
+
+
