@@ -877,3 +877,143 @@ kubectl logs mypod -c init-container-1
 kubectl logs mypod -c init-container-2
 ```
 
+# Kuberbetes Manifest
+A Kubernetes manifest is a YAML or JSON file that describes the desired state of a Kubernetes resource. 
+
+These examples cover a range of Kubernetes resources, including pods, services, deployments, config maps, secrets, and persistent volumes. Each manifest is defined in YAML format, and you can apply these manifests using kubectl apply to create or update the corresponding resources in a Kubernetes cluster.
+
+    - Pod Manifest
+    - Service Manifest
+    - Deployment Manifest
+    - ConfigMap Manifest
+    - Secret Manifest
+    - PersistentVolume Manifes
+
+Kubernetes uses these manifests to understand what resources to create, update, or delete in a cluster. Manifests are typically used to define and configure different types of resources such as pods, services, deployments, and more.
+
+
+**This is made of 4 parts that you need to understand.**
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+Spec:
+  containers:
+      - name: mycontainer
+        image: nginx:latest
+
+```
+
+### API-version:
+Is the version of the resources that you are trying to deploy. For example, k8s has different versions.
+
+This is the version of the element you are trying to deploy. for example a service, a configmap, a por, hpa (horizontal pod autoscaling).
+You dont determine which api version of the resource to use. This is determined by k8s. Forexampple, to determine which version of the deployment file or the service file I need to use, here is the command and i grep the object. 
+
+```
+kubectl api-resources | grep deployment
+
+```
+
+### Kind:
+
+The kind is the name of the resource you are trying to deploy. The name of the resource / kind always starts with the capital letter. 
+
+### Metadata:
+This is data that is set and final. When this is changed in the manifest, when deployed, it will create a new pod. 
+
+For example, when i change something in the spec section and deploy, the older pod will be killed and the new pod will run. But if the metadata is changed, and i deploy, k8s will create a different pod on top of the original pod. 
+
+- **name:** This is the name of the element we want to deploy under kind. This is the only mandatory field. We have to have a name because this is what identifies the resoyrce. We can have multiple resources in one manifests, eg, multiple services, multiple deployments etc. To be able to identify the specific     
+
+- **label:** - is the nickname of the metadata. 
+
+- **anotation:** Instructions that we put. we also put the namespace where this will be deployed. If you dont specify the namespace, k8s will deploy wherever you are or in the defualt namespace.  
+Name space can also be defined at runtime using the -n namespace
+```
+kubectl -n s6chrtopher apply -f deployment.yml
+```
+
+```
+metadata:
+  name: mypod
+  labels:
+    app: myapp
+  annotations:
+    description: "This is a sample Pod"
+  namespace: s6christopher
+```
+### Spec:
+These are anything that can change the behavoir of the pod will go in the spec. Eg, replicaset, etc.
+
+1. Resources:
+The resource typically refers to the compute resources that are allocated to a container within a pod. These compute resources include CPU and memory.
+
+These resources come from the node, since the pod is inside the node. This section . we ***request*** helps make the neccesary resources (memory and cpu) needed for the pod to run and also set a ***limit*** so tha the pod doesnt overuse the resource from the node. 
+
+If this is not set, a specific pod without limits is able to use all the memory of the node. (Docker automatically sets the limit as the available node memory). If there is a process that hikes the cpu and memory use in the pod, it will eat all the availabel memory and shuts down the rest of the pods running in the that node. 
+
+The other pods withno memory will show OOM issue (Out of memory issue). This can shut down production. 
+```
+spec:
+  containers:
+    - name: mycontainer
+      image: nginx:latest
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+
+```
+
+2. Volume mount:
+
+```
+spec:
+  containers:
+    - name: mycontainer
+      image: nginx:latest
+      volumeMounts:
+        - name: myvolume
+          mountPath: /app/data
+  volumes:
+    - name: myvolume
+      emptyDir: {}
+
+```
+3. Imagepullpolicy and Image pull secret.
+
+The imagePullPolicy and imagePullSecrets are additional configurations under the spec section of a container in a Kubernetes manifest. 
+```
+spec:
+  containers:
+    - name: mycontainer
+      image: nginx:latest
+      imagePullPolicy: Always
+      volumeMounts:
+        - name: myvolume
+          mountPath: /app/data
+  imagePullSecrets:
+    - name: myregistrysecret
+  volumes:
+    - name: myvolume
+      emptyDir: {}
+
+```
+
+1.  imagePullPolicy specifies the container image pull policy. 
+
+- Always: The kubelet will always pull the image from the registry, even if it already exists on the node.
+
+- IfNotPresent: The kubelet will pull the image only if it doesn't exist on the node.
+
+- Never: The kubelet will not pull the image from the registry. It assumes the image is present on the node.
+
+If changes are made on the original image and pushed to dockerhub, the "ifpresent" and "never" options cant pull the new updates, therefore its better to set it to "always".
+
+
+imagePullSecrets is used to specify credentials for pulling private container images from a registry. It references a secret that contains the required authentication information. In this example, a secret named myregistrysecret is specified.

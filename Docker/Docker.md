@@ -1,6 +1,7 @@
 # DOCKER
 Here is the [docker](https://docs.google.com/presentation/d/1QbPGlIae_pS93FOYesO28rXTf_bQXtHBQFFRueFFq30/edit#slide=id.g19f892e151f_0_0) ppt on google drive and the [ppt](https://docs.google.com/presentation/d/1igfOG9fDcBVBl3guRdBPJlsocFp3iJwa/edit#slide=id.p12) 
 
+
 There are different Linux flavors, including Ubuntu and centOS, and in order to install some applications, you need a different command to install them. For example, for centOs, you need yum install, while for Ubuntu, you need apt-install.
 The problem is that one virtual machine cant be used to run all operations regardless of the flavors of Linux. Therefore we would need multiple virtual machines that would be used to run every time a specific flavor is needed. 
 

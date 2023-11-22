@@ -6,6 +6,11 @@ These are some of the commands in kubernetes
 kubectl create ns s6christopher
 ```
 
+- cding or changing to new namespace
+
+```
+```
+
 - Deleting a resource that you are not using
 ```
 kubectl delete "object name"  "name of your object"
@@ -35,6 +40,22 @@ kubectl get pod -owide
 ```
 kubectl describe svc thomisis
 ```
+
+- Check services running
 ```
 kubectl get svc -A
+```
+- see if there is a pod disruption budget
+```
+kubectl get pdb
+```
+ -  Applying or deploying a manifest
+```
+kubectl apply -f path/to/your-manifest.yaml
+
+```
+-  Knowing APIversion of a resource / object
+```
+kubectl api-resources | grep deployment
+
 ```
