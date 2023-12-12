@@ -1503,7 +1503,7 @@ spec:
 - helm chart you can deploy
 - metric server - for autoscaling without HAS 
 - PATCHING? 
-- SONAQUE - SCAN CODE FOR APP
+- SONAR    QUbe- SCAN CODE FOR APP
 - PULL SECRET POLICY
 - VOLUME VS VOLUME MOUNT?
 - SPLUNK, DATADOG (PAGERDUTY)
