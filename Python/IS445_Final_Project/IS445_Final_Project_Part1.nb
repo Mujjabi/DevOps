@@ -1,0 +1,558 @@
+# %% [markdown]
+# IS445 - Data Vizualization  - Fall 2023
+
+## Final_Project_Part1
+
+### Student: Christopher Mujjabi
+
+### Date: December 8th, 2023
+# %% [markdown]
+The dataset used for part one (visualization for self) is a dataset I collected as part of my Master’s thesis research in the Crop Science Department at the University of Illinois. The dataset was collected from an experiment that was conducted for 3 growing seasons (2018, 2019 and 2020). 
+
+This experiment  evaluated agronomic, and root architectural response of maize hybrids grown with different levels of nitrogen inputs and under the manipulated weed competition in organically managed fields. The experiment applied a RCBD using a split-split plot arrangement, with three external nitrogen fertility inputs as whole plots **(0, 112 and 224 kg/ha)**, ten **hybrids** as subplots, and two weed treatments **(weed-minus, weed-plus)** as sub-subplots.
+
+The study was conducted over three years (2018 to 2020) in four organically managed locations in Illinois **(Pana, Macomb,UIUC2019 and UIUC2020)** with four replications per location. Hybrids were phenotyped for above-ground traits such as plant height (PHT), Ear height (EHT), stem diameters (SDL and SDS), grain yield (YIELD), grain chemical compostion (Protein, Starch and Oil) and assessed for below-ground root architectural traits (root angles;RTA and root complexity;FDT) using high-throughput image analysis.
+
+I normally use Rstudio to conducted statistical analysis and generate visualizations. However, I wanted to explore other data manipulation and visualization engines covered in this class to manipulate and visualize my data and hopefully find new interesting patterns that I didnt find with Rstudio. In addition, Rstudio doesnt offer much interactivity as these new tools covered in class such as vegalite and matplotlip.
+# %% [markdown]
+## Importing vega-lite
+
+Here I import the Javascript libraries that I needed for to construct my visualizations. Since I will need vega-lite, below is the import command that i used to import the vega-lite libraries. 
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+# ---%%
+await import('https://cdn.jsdelivr.net/npm/vega@latest');
+await import('https://cdn.jsdelivr.net/npm/vega-lite@latest');
+await import('https://cdn.jsdelivr.net/npm/vega-embed@latest');
+# %% [markdown]
+## Importing Python Libraries and Modules
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+import pyodide
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.transforms as transforms
+
+# %% [markdown]
+## Importing data
+
+I imported the data from my github repository using the pyodide module in python
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+url = "https://raw.githubusercontent.com/Mujjabi/DevOps/main/Python/IS445_Final_Project/Data_FinalProject.csv"
+df = pd.read_csv(pyodide.open_url(url))
+# %% [markdown]
+## Experimental Design
+
+We used the RCBD (randomized complete block design) a split-split plot arrangement, with three external nitrogen fertility inputs as whole plots **(0, 112 and 224 kg/ha)**, ten **hybrids** as subplots, and two weed treatments **(weed-minus, weed-plus)** as sub-subplots. The study was conducted in four organically managed locations in Illinois **(Pana, Macomb,UIUC2019 and UIUC2020)** with four replications per location.
+
+#### Design variables Explained:
+
+**Year:** Growing season 
+
+**Location:** The site (environment) where the experiment was planted
+
+**Range:** The y axis of the field
+
+**Row:** The x axis of the field
+
+**Plot:** Smallest unit of observation. Each plot has 4 rows of 2.5 wide and 17.5 ft long. 
+
+**Rep:** The replication within a site. Each site had 4 replications
+
+**Nitrogen:** The whole plot treatment. 3 nitrogen dosages were used (N1,N2, N3). 
+
+**Weed_Pressure:** The sub plot treatment. 2 levels of weed pressure were used (Weedplus and Weedminus). 
+
+**Hybrid:** These are the different experimental maize hybrids tested in the experiment. 
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+factors = df.iloc[:, 1:11]  # Select columns 2 to 13
+factors.info()
+# %% [markdown]
+## Data Cleaning
+
+During the 3 years the experiment was conducted, there were extunueting circumestances that impeded the collection of data from each and every plot at a given location. For example, the derecho and hailstorm in 2020 destroyed the majority of the field at the UIUC2020 location, hence creating a lot of missing values in the dataset as shown below.  
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+Traits = df.iloc[:, -10:]
+missing_values_all = Traits.isnull().sum()
+missing_values_df = pd.DataFrame({'Trait':Traits.columns,'missing_values': missing_values_all, '%missing': (missing_values_all / 960) * 100})
+#missing_values_df  = missing_values_df.drop(columns=missing_values_df.columns[0])
+print(missing_values_df)
+# %% [markdown]
+Some traits such as stem diameters (SDL and SDS) had over 25% of missing values since they were not measured one of the 4 location. Therefore, these had to be eliminated from the dataframe. Below is the dataframe with the complete values for each trait.
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+Traits_to_fill = ['PHT', 'EHT','SDL','SDS','YIELD', 'PROT', 'OIL', 'STA', 'FDT', 'RTA']
+
+# Group by Hybrid, Nitrogen, Weed Pressure, and calculate means across all locations for each trait
+for trait in Traits_to_fill:
+    grouped_means = df.groupby(['Nitrogen', 'Weed_Pressure', 'Hybrid'])[trait].transform('mean')
+    overall_mean = df[trait].mean()  # Calculate the overall mean across all locations
+    df[trait] = df[trait].fillna(grouped_means.fillna(overall_mean))
+
+# Display the updated DataFrame
+print(df)
+# %% [markdown]
+### Clean-Dataset
+
+After replacing the missing values of a given hybrid with the overall mean of that specific hybrid under similar treatment combination, we can observe that all missing values were replaced and we finally have a complete dataset we can use for further analysis.  This is demostrated by re-running the previous lines of code that displayed missing values in the measured traits. 
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+Traits = df.iloc[:, -10:]
+Traits.describe()
+missing_values_all = Traits.isnull().sum()
+missing_values_df = pd.DataFrame({'Trait':Traits.columns,'missing_values': missing_values_all, '%missing': (missing_values_all / 960) * 100})
+#missing_values_df  = missing_values_df.drop(columns=missing_values_df.columns[0])
+print(missing_values_df)
+# %% [markdown]
+## Summary statistics for all measured traits
+
+In each location, hybrids were evaluated for their agronomic traits such as plant height (PHT/cm), ear height (EHT/cm), small stem diameter (SDS/mm), large stem diameter (SDL/mm), and grain yield (YIELD/Bu/Acre). At R3 stage, hybrids were also evaluated for root architectural traits such as root angle (RTA/degrees) and root complexity measured as fractal dimension (FDT). After harvest, grain samples of each plot were collected to evaluate the chemical composition of the kernels. The measured kernel compositional traits included percentage protein content (PROT/%), oil content (OIL/%) and starch coontent (STA/%).
+
+\
+Below are the summary statistics for all the measured traits across all treatments and locations.
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+Traits = df.iloc[:, -10:]
+Traits.describe()
+# %% [markdown]
+The average plant height across the four locations was 228 cm with a minimum and maximum of 114 and 302 cm, respectively, and a standard deviation of 33 cm. Average ear height was 103 cm, with a minimum and maxmum values of 47 cm and 217 cm, respectively and a standard deviation of 23 cm. Likewise, stem diameter ranged between 42 mm and 21 cm.  The average grain yield across locations was 116 Bu/Acre, with a minimum of 10 Bu/Acre, a maximum of 216 Bu/Acre and a standard deviation of 48 Bu/Acre. Mean root angles was 80 degrees, with a minimum of 40 degrees, maximum of 133 degrees and a standard deviation of 17 degrees. For the kernel composition traits, mean protein, oil and starch were 8.4%, 3.8% and 71%, respectively. 
+# %% [markdown]
+## Distribution of Trait Values
+
+The first visualization I created was a histogram for each trait to observe the distribution of values within each measured trait. This enables the inspection of the dataset to determine if their is a normal distribution (as expected), and identify any outliers without the dataset. I used python matplotlib module to construct these histograms.
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+with plt.style.context("ggplot"): 
+    fig, ((PHT_ax, EHT_ax, YLD_ax), (SDL_ax, FDT_ax, RTA_ax),(PROT_ax, STA_ax, OIL_ax)) = plt.subplots(nrows=3, ncols=3, figsize=(11, 14))
+    locations = df['Location'].unique()  
+    for location in locations:
+        P = df[df['Location'] == location]['PHT']
+        PHT_ax.hist(P, bins=20, alpha=0.7, label=location)
+    PHT_ax.set_title("Plant Height",fontsize=10)
+    PHT_ax.set_xlabel("Plant Height [cm]", fontsize=8)
+    PHT_ax.set_ylabel("Frequency", fontsize=8)
+    PHT_ax.legend(fontsize=6)
+
+  # Plot for "EHT"
+    for location in locations:
+        E = df[df['Location'] == location]['EHT']
+        EHT_ax.hist(E, bins=20, alpha=0.7, label= location)
+    EHT_ax.set_title("Ear Height", fontsize=10)
+    EHT_ax.set_xlabel("Ear Height [cm]",fontsize=8)
+    EHT_ax.set_ylabel("Frequency",fontsize=8)
+    EHT_ax.legend(fontsize=6)
+
+# Plot for "YLD"
+    for location in locations:
+        Y = df[df['Location'] == location]['YIELD']
+        YLD_ax.hist(Y, bins=20, alpha=0.7, label= location)
+    YLD_ax.set_title("Grain Yield", fontsize=8)
+    YLD_ax.set_xlabel("Grain Yield [Bu/Acre]",fontsize=8)
+    YLD_ax.set_ylabel("Frequency",fontsize=8)
+    YLD_ax.legend(fontsize=6)
+
+
+
+# Plot for "SDL"
+    for location in locations:
+        S = df[df['Location'] == location]['SDL']
+        SDL_ax.hist(S, bins=20, alpha=0.7, label= location)
+    SDL_ax.set_title("Stem Diameter", fontsize=10)
+    SDL_ax.set_xlabel("Stem Diameter [mm]",fontsize=8)
+    SDL_ax.set_ylabel("Frequency",fontsize=8)
+    SDL_ax.legend(fontsize=6)
+
+
+  # Plot for "RTA"
+    for location in locations:
+        R = df[df['Location'] == location]['RTA']
+        RTA_ax.hist(R, bins=20, alpha=0.7, label= location)
+    RTA_ax.set_title("Root Angle", fontsize=10)
+    RTA_ax.set_xlabel("Root Angle [Degrees]",fontsize=8)
+    RTA_ax.set_ylabel("Frequency",fontsize=8)
+    RTA_ax.legend(fontsize=6)
+
+
+  # Plot for "FDT"
+    for location in locations:
+        F = df[df['Location'] == location]['FDT']
+        FDT_ax.hist(F, bins=20, alpha=0.7, label= location)
+    FDT_ax.set_title("Root Complexity", fontsize=10)
+    FDT_ax.set_xlabel("Fractal Dimension",fontsize=8)
+    FDT_ax.set_ylabel("Frequency",fontsize=8)
+    FDT_ax.legend(fontsize=6)
+
+
+# Plot for "PROT"
+    for location in locations:
+        PR = df[df['Location'] == location]['PROT']
+        PROT_ax.hist(PR, bins=20, alpha=0.7, label= location)
+    PROT_ax.set_title("Protein Content", fontsize=10)
+    PROT_ax.set_xlabel("Protein [%]",fontsize=8)
+    PROT_ax.set_ylabel("Frequency",fontsize=8)
+    PROT_ax.legend(fontsize=6)
+
+
+  # Plot for "STA"
+    for location in locations:
+        ST = df[df['Location'] == location]['STA']
+        STA_ax.hist(ST, bins=20, alpha=0.7, label= location)
+    STA_ax.set_title("Starch Content", fontsize=10)
+    STA_ax.set_xlabel("Starch [%]",fontsize=8)
+    STA_ax.set_ylabel("Frequency",fontsize=8)
+    STA_ax.legend(fontsize=6)
+
+
+  # Plot for "OIL"
+    for location in locations:
+        O = df[df['Location'] == location]['OIL']
+        OIL_ax.hist(O, bins=20, alpha=0.7, label= location)
+    OIL_ax.set_title("Oil Content", fontsize=10)
+    OIL_ax.set_xlabel("Oil [%]",fontsize=8)
+    OIL_ax.set_ylabel("Frequency",fontsize=8)
+    OIL_ax.legend(fontsize=6)
+  
+plt.show()
+# %% [markdown]
+### Results
+
+We can observe in the plotted histograms above that the majority of the traits were normally distributed accros all locations. Some locations obtained lower values compared to other. The lowest values were obtained from UIUC2020 location while highest values were obtained from Pana and UIUC2019 locations.
+
+Based on the distribution charts below, a few outliers in some traits were identified. For example, the ear height value above 200 cm is an outlier since it was far away from the population mean. Other traits with outlier values included stem diameter above 40 mm, Root angle above 120 , root complexity below 1.75, and protein content above 12.
+
+These values could be inspected to determine if they were real values or were a result of a human error during note taking, and hence must be removed before conducting further stastical analysis on the dataset.
+# %% [markdown]
+## Using vega-lite to construct interactive visualizations.
+
+I wanted to transfer the cleaned data from python and construct visualizations with vega-lite.
+
+I converted the dataset, but I could not figure out how to use it in the vega-lite specification.
+
+Therefore, I decided to fetch the data again from github to construct vega-lite visualizations
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+# ---%%
+const data = pyodide.globals.get('df')
+data
+# %% [markdown]
+## Performance by Location
+
+The visualization presented below illustrates the average trait performance of all tested hybrids across various locations. Crafting this visualization posed a significant challenge as it required joining two distinct graphs. Initially, bar graphs were employed to depict the mean values of each trait across different locations. Subsequently, error bars were superimposed onto the bar graphs to portray the dispersion of data within each location. This intricate design provides a comprehensive view of the variability of traits, offering valuable insights into the hybrid performance across diverse geographic settings.
+
+I also added a tooltip for interactivity, where when one hoovers over the bars of each trait, the average of the the selected trait in the selected location will be shown.
+
+From the visualization, we can conclude that Pana and UIUC2019 were the best performing locations for most of the agronomic traits. UIUC2020 was the worst performing location across all measured traits. SDL and SDS were not measured for this location.
+# %%--- [html]
+# properties:
+#   run_on_load: true
+# ---%%
+<div id="my_viz"> Histograms go here </div>
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+# ---%%
+var data2 = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 1000,
+  "height": 400,
+  "title": {"text": "Mean Trait Values Across Locations", "fontSize": 25, "anchor": "middle", "offset": 5},
+  "repeat": ["PHT", "EHT", "YIELD", "SDL", "SDS", "PROT", "OIL", "STA", "FDT", "RTA"],
+  "columns": 5,
+  "spec": {
+    "data": {"url": "https://raw.githubusercontent.com/Mujjabi/DevOps/main/Python/IS445_Final_Project/Data_FinalProject.csv"},
+    "transform": [
+      {"filter": "datum.YIELD !== 'NA' && datum.PHT !== 'NA' && datum.EHT !== 'NA'"},
+      {"filter": "datum.PROT !== 'NA' && datum.STA !== 'NA' && datum.OIL !== 'NA' && datum.FDT !== 'NA' && datum.RTA !== 'NA'"}
+    ],
+    "layer": [
+      {
+        "mark": "bar",
+        "encoding": {
+          "y": {"field": {"repeat": "repeat"}, "aggregate": "mean"},
+          "x": {"field": "Location", "title": ""},
+          "color": {
+            "field": "Location",
+            "type": "nominal",
+            "title": "Location",
+            "scale": {"scheme": "category10"}
+          },
+        "tooltip": [
+        {"field": "Location", "type": "nominal", "title": "Location"},
+        {"field": {"repeat": "repeat"}, "type": "quantitative", "aggregate": "mean"},
+      ],
+        }
+      },
+      {
+        "mark": {"type": "errorbar", "extent": "stdev", "filled": true, "color": "black", "ticks": {"color": "black"}},
+        "encoding": {
+          "y": {"field": {"repeat": "repeat"}, "type": "quantitative", "scale": {"zero": true}},
+          "x": {"field": "Location", "type": "ordinal"}
+        }
+      },
+      {
+        "mark": {"type": "point", "filled": true, "color": "black"},
+        "encoding": {
+          "y": {"field": {"repeat": "repeat"}, "type": "quantitative", "aggregate": "mean"},
+          "x": {"field": "Location", "type": "ordinal"}
+        }
+      }
+    ]
+  }
+};
+
+var embedplot = await vegaEmbed("#my_viz", data2);
+# %% [markdown]
+## Inspecting for Spatial - Variability Across Locations
+
+The visualization below displays the distribution of grain yield across the four locations. This enables us to visualise any spatial variation that is due to the field effect.
+
+Each small square represent a hybrid planted in a  four-row plot, and recieved a certain nitrogen and weed treatment. This can be seen using the added tooltip, by hoovering over each square to identiy best and worst performers in each field. Hybrid performance is represented by the color scale shown on the legend where the deep blue color signifies high yield and the lighter color shows lower yields. The completely white spaces represent plots with missing data for yield. 
+
+We expect to see random distribution of grain yield across each field. Some fields such as Pana, seemed to  show more normally distributed yields.  However, as shown below, there were some fields that had patterns of performance in certain areas of the field. In UIUC2019, hybrids planted in ranges 21 to 24 seemed to perform poorly compared to other ranges. In UIUC2020, the entire field performed poorly due to the derecho and hailstrom that destroyed the field right before flowering.
+# %%--- [html]
+# properties:
+#   run_on_load: true
+# ---%%
+<div id="yieldmap2"></div>
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+# ---%%
+var yieldmap2 = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {"url": "https://raw.githubusercontent.com/Mujjabi/DevOps/main/Python/IS445_Final_Project/Data_FinalProject.csv"},
+  "title": {"text": "Yield Map per Location","fontSize": 25, "anchor": "middle", "offset": 5},
+  "config": {
+    "view": {
+      "strokeWidth": 2,
+      "step": 30
+    },
+    "axis": {
+      "domain": false
+    }
+  },
+  "facet": {
+    "row": {"field": "Location", "type": "ordinal"}
+  },
+  "selection": {
+    "hover": {"type": "single", "fields": ["Hybrid"], "empty": "none"}
+  },
+  "spec": {
+    "mark": "rect",
+    "encoding": {
+      "x": {"field": "Range","type": "ordinal","title": "Range", "axis": {"labelAngle": 0, "grid": false, "labelFontSize": 15, "titleFontSize": 20},
+        "sort": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"]
+      },
+      "y": {"field": "Row","type": "ordinal","title": "Row","sort": ["-y"],  "axis": {"labelAngle": 0, "grid": false, "labelFontSize": 15, "titleFontSize": 20},},
+      "color": {"field": "YIELD", "aggregate": "max", "type": "quantitative","legend": {"title": "Yield", "labelFontSize": 20}
+      },
+      "tooltip": [
+        {"field": "Hybrid", "type": "nominal", "title": "Hybrid"},
+        {"field": "Nitrogen", "type": "nominal", "title": "Nitro"},
+        {"field": "Weed_Pressure", "type": "nominal", "title": "Weed"},
+        {"field": "YIELD", "type": "quantitative", "title": "Yield"}
+      ]
+    },
+    "config": {"scale": {"bandPaddingInner": 0.1}
+    },
+    "selection": {
+      "highlight": {"type": "single", "encodings": ["x", "y"],"empty": "none","on": "mouseover"}
+    }
+  }
+};
+
+var embedcor = await vegaEmbed("#yieldmap2", yieldmap2)
+# %% [markdown]
+## Nitrogen and weed pressure effect on performance
+
+The objective of the experiment was to evaluate the effect of different nitrogen dosages **(N1, N2 and N3)** and two weed pressure treatments **(WMINUS and WPLUS)** on the above and below ground traits of different experimental maize hybrids. 
+
+To archive the above mentioned objective, I used bar graphs to present the experimental treatment effects (nitrogen and weed pressure levels) on yield in each location. We can observe a similar performance trend across all locations, where grain yield increases as the nitrogen level increases, and decreases as we increase the weed pressure.
+
+# %%--- [html]
+# properties:
+#   run_on_load: true
+# ---%%
+<div id="NitroWeed" ></div>
+<div id="yieldbyweeds" ></div>
+
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+# ---%%
+var yieldByNitro = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 100,
+  "height": 400,
+  "title": {"text":"Average Location Yield per Nitrogen Treatment","fontSize": 20, "anchor": "middle", "offset": 5},
+  "data": {"url": "https://raw.githubusercontent.com/Mujjabi/DevOps/main/Python/IS445_Final_Project/Data_FinalProject.csv"},
+  "transform": [
+    {"filter": "datum.YIELD !== 'NA'"}],
+  "mark": "bar",
+  "encoding": {
+    "column": {"field": "Location", "header": null},
+    "y": {"field": "YIELD", "type": "quantitative", "aggregate": "mean", "axis": {"labelAngle": 0, "grid": true, "labelFontSize": 13, "titleFontSize": 20}},
+    "x": {"field": "Nitrogen", "axis": {"labelAngle": 0, "grid": true, "labelFontSize": 13, "titleFontSize": 20}},
+    "color": {"field": "Location"},
+    "tooltip": [
+        {"field": "Nitrogen", "type": "nominal", "title": "Nitrogen"},
+        {"field": "YIELD", "type": "quantitative", "aggregate": "mean", "title": "Mean Yield"},]
+    },
+  "config": {
+    "view": {"stroke": "transparent"}
+  }
+};
+
+var yieldByWeeds = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 100,
+  "height": 400,
+  "title": {"text": "Average Location Yield per Weed Treatment","fontSize": 20, "anchor": "middle", "offset": 5},
+  "data": {"url": "https://raw.githubusercontent.com/Mujjabi/DevOps/main/Python/IS445_Final_Project/Data_FinalProject.csv"},
+  "transform": [
+    {"filter": "datum.YIELD !== 'NA'"}],
+  "mark": "bar",
+  "encoding": {
+    "column": {"field": "Location", "header": null},
+    "y": {"field": "YIELD", "type": "quantitative", "aggregate": "mean","axis": {"labelAngle": 0, "grid": false, "labelFontSize": 13, "titleFontSize": 20}},
+    "x": {"field": "Weed_Pressure", "title": "Weed", "axis": {"labelAngle": 0, "grid": true, "labelFontSize": 12, "titleFontSize": 18}},
+    "color": {"field": "Location"},
+   "tooltip": [
+        {"field": "Weed_Pressure", "type": "nominal", "title": "Weed_Pressure"},
+        {"field": "YIELD", "type": "quantitative", "aggregate": "mean", "title": "Mean Yield"},
+   ]
+    },
+  "config": {
+    "view": {"stroke": "transparent"}
+  }
+};
+
+var NitroWeed = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "hconcat": [yieldByNitro, yieldByWeeds]
+};
+
+var embedcor = await vegaEmbed("#NitroWeed", NitroWeed);
+
+# %% [markdown]
+## Hybrid Performance
+
+In the visualization below shows the average grain yield of each tested experimental hybrid across all years and locations under all treatment combinations. The first bargraph shows the over all mean of each hybrid, while the second and third graphs show the average grain yield obtained for each nitrogen and weed pressure levels, obtained by averaging the performance of all tested hybrids under each treatment.
+
+However, we are interested in evaluating the performance of these hybrids under varying nitrogen and weed pressure treatments.
+
+To achieve this goal, I decided to add a selection parameter whereby if a given hybrid is selected from (highlight the bar), the yield values in the nitrogen and weed pressure treatments change to the mean performance of that hybrid under these varying treatmen. All the unselected hybrids will turn blue. Under nitrogen and weed pressure graphs, the background bar color will turn blue to represent global means, and the front colors will represent the means of the selected hybrid under these treatments. 
+
+I also added a tooltip which displays the mean performance of the selected hybrid under each treatment. 
+# %%--- [html]
+# properties:
+#   run_on_load: true
+# ---%%
+<div id="yieldmap3"></div>
+# %%--- [javascript]
+# properties:
+#   run_on_load: true
+# ---%%
+var yieldmap3 =
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width":800,
+  "data": {"url": "https://raw.githubusercontent.com/Mujjabi/DevOps/main/Python/IS445_Final_Project/Data_FinalProject.csv"},
+  "title": {"text": "Average Yield per Treatment", "fontSize": 25, "anchor": "middle", "offset": 5},
+  "transform": [{"filter": "datum.YIELD !== 'NA'"}],
+  "repeat": {"column": ["Hybrid", "Nitrogen", "Weed_Pressure"]},
+  "spec": {
+    "layer": [{
+      "params": [{
+        "name": "brush",
+        "select": {"type": "interval", "encodings": ["x"]}
+      }],
+      "mark": "bar",
+      "encoding": {
+        "x": {"field": {"repeat": "column"}, "axis": {"labelAngle": 270, "grid": true, "labelFontSize": 13, "titleFontSize": 18}},
+        "y": {"field": "YIELD", "aggregate": "mean", "axis": { "title": "Grain Yield [Bu/Acre]", "labelAngle": 0, "grid": true, "labelFontSize": 12, "titleFontSize": 15}},
+        "color": {"field": "column", "type": "nominal", "legend":null },
+        "tooltip": [
+          {"field": "YIELD", "type": "quantitative", "aggregate": "mean", "title": "Yield"}
+        ]
+      }
+    }, {
+      "transform": [{"filter": {"param": "brush"}}],
+      "mark": "bar",
+      "encoding": {
+        "x": {"field": {"repeat": "column"}},
+        "y": {"field": "YIELD", "aggregate": "mean"},
+        "color": {"field": {"repeat": "column"}, "type": "nominal", "legend": null},
+        "tooltip": [
+          {"field": "Hybrid", "type": "nominal", "title": "Hybrid"},
+          {"field": "YIELD", "type": "quantitative", "aggregate": "mean", "title": "Yield"}
+        ]
+      }
+    }]
+  }
+}
+
+
+var embedcor = await vegaEmbed("#yieldmap3", yieldmap3)
+# %% [markdown]
+## Trait Correlations
+
+In our quest to enhance crop productivity, understanding the relationships between grain yield and other measured traits is pivotal. Correlation analysis serves as a valuable tool, allowing us to identify traits that exhibit positive or negative correlations with grain yield. This insight aids in strategic plant breeding, enabling the selection and improvement of traits that positively influence our primary target—grain yield. Understanding these correlations guides our selection criteria, allowing us to make informed decisions to either enhance favorable traits or mitigate the impact of traits negatively affecting grain yield.
+
+By employing this correlation analysis, we gain valuable insights into the intricate relationships among key traits, paving the way for more effective and targeted crop improvement strategies.
+
+ I used python to conduct a pearson correlation analysis and below is the table of all traits used in the correlation analyis.
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+Traits = df.iloc[:, -10:]
+Traits.describe()
+# %%--- [python]
+# properties:
+#   run_on_load: true
+# ---%%
+correlation_matrix = Traits.corr()
+
+# Create a heatmap using matplotlib
+plt.figure(figsize=(10, 8))
+plt.imshow(correlation_matrix, cmap='Blues')
+plt.colorbar(label='Correlation')
+plt.xticks(range(len(correlation_matrix)), correlation_matrix.columns, rotation=45)
+plt.yticks(range(len(correlation_matrix)), correlation_matrix.columns)
+plt.title('Correlation Plot for Agronomic, Nutritional and Root Architectural Traits')
+
+# Add correlation coefficients as annotations
+for i in range(correlation_matrix.shape[0]):
+    for j in range(correlation_matrix.shape[1]):
+        plt.text(j, i, f"{correlation_matrix.iloc[i, j]:.2f}",
+                 ha='center', va='center', color='black', fontsize=8)
+plt.show() 
+
+# %% [markdown]
+### Results
+
+From the correlation plot above, we can see some traits that are highly correlated with each other and some that are negatively correlated. Forexample, we observe a positive correlation between grain yield, plant height, ear height, root angles, stem diameter and starch. On the other hand, we observe a negative correlation between grain yield and oil content, and root complexity (FDT). 

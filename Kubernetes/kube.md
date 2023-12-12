@@ -1,6 +1,9 @@
 # Kubernetes 
 Here is the link to the kubernetes [powerpoint](https://docs.google.com/presentation/d/1WxApP_IwQOfjdVjHrLKoOrlzZXwbWM4M/edit#slide=id.g142824cfa6a_1_26)
 
+
+This tool [Kompose](https://kompose.io/)helps to migrate from the docker compose k8s. 
+
 ### upgrading k8s
 You cant upgrade k8s from one version to another skipping versions. Forexample from 1.26 to 1.28. You need to go one version at a time. From 1.26, to can only go to 1.27. Also, you cant go back to old versions if you upgrade.
 
@@ -1126,3 +1129,384 @@ Another example, the deployment.yaml doesnt mention the service anywhere. But k8
 
 ### Kyverno:
 Some companies install this program called kyverno to impede anyone to deploy anything without a label. 
+
+
+## Image pull Policy
+
+
+
+
+### Node selector
+![Alt text](<WhatsApp Image 2023-12-04 at 19.38.50_eec25d81.jpg>)
+
+We have 4 applications (A, B, C and D) and we have a cluster with 7 nodes. Different nodes have different operating systems (centos, redhat, ubuntu etc). However, the applications are compartible or functions well using a certain operating system. 
+
+If we ask or rely on the scheduler to schedule these pods for us, it will randomly schedule these pods based on the nodes availability and working conditions. 
+
+Therefore, we need to use the **node selector** to to tell the scheduler to only schedule these pods on the nodes that have compartible operating systems. Here we use **Label**. Both the node and the pod you need to be scheduled need to have the same label so that the matchLabel. We ask the scheduler to ONLY SCHEDULE this pod on the node that has this matching label. 
+
+#### Labeling the node
+```
+kubectl label node server2-cluster-fvrau data=red  #data=red is the label
+
+```
+This command adds a label to the Kubernetes node named *server2-cluster-fvrau.* The label being added is *data* with the value *red*. This can be useful for various purposes, such as node selection in a deployment or specifying node-specific configurations.
+
+Here is a manifest to deploy a pod, but only on the node that has the same label (red) as our pod. 
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx:latest
+  nodeSelector:
+    data: red   # Node label to match
+```
+Then deploy the pod. 
+
+```
+kubectl apply -f pod-with-label.yaml
+```
+
+### Node affinity/anti-affinity
+Node affinity is another Kubernetes feature that allows you to influence the scheduling of Pods based on node attributes, such as node labels. With node affinity, you can specify rules to ensure that Pods are scheduled on nodes that match certain criteria
+
+The conditions for schedule the pods are *requiredDuringSchedulingIgnoredDuringExecution* and *preferredDuringSchedulingIgnoredDuringExecution* to determine the affinity. 
+
+1. requiredDuringSchedulingIgnoredDuringExecution:
+
+This term refers to a strict requirement during the scheduling phase.
+Pods with requiredDuringSchedulingIgnoredDuringExecution affinity or anti-affinity rules must be placed on nodes that meet the specified criteria during the scheduling process.
+
+However, once a Pod is scheduled, changes to node labels or conditions that violate the affinity/anti-affinity rule are ignored. The rule is enforced during scheduling but not during the execution phase.
+
+```
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: "data"
+          operator: In
+          values:
+          - "red"
+```
+
+You will see this error if affinity requirements not met. 
+~~~
+Warning  FailedScheduling  x seconds (x waiting to be scheduled, x waiting in unspecified queue)
+0/1 nodes are available: 1 node(s) didn't match node affinity rules.
+~~~
+
+2. PreferredDuringSchedulingIgnoredDuringExecution:
+
+This term indicates a preference rather than a strict requirement.
+Pods with preferredDuringSchedulingIgnoredDuringExecution affinity or anti-affinity rules will try to be scheduled on nodes that meet the specified criteria, but they are not strictly bound to it.
+
+If nodes satisfying the preferred rule are not available, the scheduler can still place the Pod on nodes that don't meet the preference.
+~~~
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - preference:
+        matchExpressions:
+        - key: "data"
+          operator: In
+          values:
+          - "red"
+      weight: 100
+~~~
+
+We will see this warning message
+~~~
+0/1 nodes are available: 1 node(s) didn't match the preferred node affinity rules.
+~~~
+0/1 nodes are available implies that there is one Pod that is not able to be scheduled.
+
+1 node(s) didn't match the preferred node affinity rules specifies that none of the available nodes satisfy the preferred affinity condition, but the scheduling will proceed on a node that doesn't match the preference.
+
+Keep in mind that the term "warning" signifies that the scheduling process encounters a preference but can still proceed without satisfying it. The Pod will be scheduled on a node even if it doesn't meet the preferred affinity, but it's a less preferred choice.
+
+#### Therefore, if you dont use nodeselector to schedule pods to nodes with matching labels, you need to use node affinity setting to "required" so that the pods are schedule on the nodes that have the same affinity value as the label set in the pod. Choose one of the 2. 
+
+## Node anti-affinity
+Node anti-affinity in Kubernetes is a mechanism that allows you to influence the scheduling of Pods by specifying rules based on the absence of other Pods on nodes. Node anti-affinity rules help distribute Pods across nodes to enhance resiliency and availability.
+
+Here's an example of using node anti-affinity in a Pod manifest:
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+spec:
+  affinity:
+    nodeAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "data"
+            operator: In
+            values:
+            - "database"
+  containers:
+    - name: postgres-container
+      image: postgres:latest
+
+```
+In this example, the Pod has an anti-affinity rule stating that it should not be scheduled on a node where there is already a Pod with the label data=database. 
+
+This helps ensure that Pods with similar characteristics or functions are not co-located on the same node, improving resiliency in case a node becomes unavailable.
+
+
+## Pod affinity and anti-affinity
+
+Pod affinity and anti-affinity are features in Kubernetes that allow you to influence the scheduling of pods in a way that either encourages them to be placed close to each other (affinity) or avoids placing them on the same node or close to each other (anti-affinity). 
+
+These features help in achieving better performance, fault tolerance, and resource utilization in your cluster.
+
+- Pod Affinity Rule:
+
+Pod affinity is specified using affinity rules. A pod affinity rule is a set of affinity expressions that determines how pods should be scheduled in proximity to each other.
+```
+affinity:
+  podAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - web
+      topologyKey: "kubernetes.io/hostname"
+```
+In this example, the pod affinity rule specifies that pods with the label app=web should be placed on nodes that share the same hostname.
+
+## Security in K8S : How do you secure your K8S environment?
+These measures collectively contribute to a comprehensive security posture for Kubernetes, addressing different layers and aspects of the container orchestration platform.
+
+1. #### Image Scanning:
+
+Regularly scan container images for vulnerabilities to ensure that you are not deploying images with known security issues.
+
+2. #### Operating System Hardening (Azure Defender):
+
+Apply security best practices to the underlying operating system, and leverage tools like Azure Defender to monitor and protect virtual machines in the Azure environment.
+
+3. #### Minimizing the Attack Surface: Base Container Images:
+
+Use minimal and secure base container images.
+Avoid running containers as the root user to reduce the potential impact of security vulnerabilities.
+
+4. #### Network Security Control (Network Policies):
+
+Implement network policies to control communication between Pods and define rules for traffic within the cluster.
+
+5. #### API Authentication:
+
+Enforce strong authentication mechanisms for accessing the Kubernetes API server to prevent unauthorized access.
+
+6. #### API Authorization:
+
+Define and enforce policies that control what actions users and applications can perform within the Kubernetes cluster.
+
+7. #### Controlling Access to the Kubelet:
+
+Secure access to the Kubelet, the primary node agent, to prevent unauthorized access and potential attacks.
+
+8. #### Controlling Container Privileges (Container Context):
+
+Define and restrict the privileges that containers have, minimizing the potential impact of a compromise.
+
+9. #### Controlling Node-to-Pod Access:
+
+Implement controls to specify which nodes are allowed to communicate with specific Pods.
+
+10. #### Restrict Access to etcd:
+
+Protect access to the etcd database, which is crucial for storing cluster state information.
+
+11. #### Rotate Infrastructure Credentials Frequently:
+
+Regularly update and rotate credentials used by the infrastructure components.
+
+12. #### Review Third-Party Integrations:
+
+Carefully assess and review third-party integrations before enabling them within the Kubernetes environment.
+
+13. #### Enable Kubernetes RBAC (Role-Based Access Control):
+
+Implement RBAC to control access to resources within the Kubernetes cluster based on roles and permissions.
+
+14. #### Isolate Kubernetes Nodes:
+
+Apply isolation measures between nodes to limit the potential impact of a compromise.
+
+15. #### Keep Kubernetes Version Up to Date:
+
+Regularly update Kubernetes to leverage the latest security patches and improvements.
+16. #### Prevent Access to Kube API Server:
+
+Secure access to the Kubernetes API server to prevent unauthorized access and potential attacks. this is a pod on the kube-system name space. if anyone takes o hacks your kube-system namespace, say bye bye to your cluster.
+
+17. #### Use Verified Images with Proper Tags:
+
+Only use container images from trusted sources, and verify image integrity with proper versioning.
+
+18. #### Limit Application Privileges:
+
+Follow the principle of least privilege for applications, granting only the necessary permissions.
+
+19. #### Prevent Access to Kube API Server:
+
+Secure access to the Kubernetes API server to prevent unauthorized access and potential attacks.
+
+
+## DEPLOYMENT STRATEGY
+
+
+1. #### Recreate (Blue-Green) Deployment:(OUTDATED)
+
+Involves deploying a new version of the application alongside the existing version.
+After deployment, traffic is switched from the old version (Blue) to the new version (Green).
+Provides easy rollback by switching traffic back to the old version.
+
+2. #### RollingUpdate Deployment:
+Gradually replaces instances of the old version with instances of the new version.
+Controlled by adjusting the number of replicas and update parameters.
+Allows continuous deployment with minimal downtime.
+
+![Alt text](<WhatsApp Image 2023-12-04 at 21.41.50_a82f84d1.jpg>)
+
+You have 4 pods in your node, all running with v1 of the image, and you want to update it to version 2 without impacting the functionality of the application. You use rollingupdate to first create a pod with the new version before killing one pod with the old versio. It does this one by one, sequencially until all pods have been replaced with the new version of the image.
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: example-app
+  template:
+    metadata:
+      labels:
+        app: example-app
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+
+```
+3. #### Canary Deployment:
+
+Introduces the new version to a subset of users or traffic gradually.
+Enables monitoring of the new version's performance and stability before full rollout.
+If issues arise, only a small portion of users are affected.
+
+4. #### A/B Testing Deployment:
+
+Similar to canary deployment, but involves testing different versions of the application simultaneously with different user groups.
+Helps compare the performance and user experience of multiple versions in real-world scenarios.
+
+5. #### Blue-Green with Detour Deployment:
+
+A variation of Blue-Green deployment where a detour service is used to control traffic routing.
+Allows for testing the new version without affecting the production environment.
+
+6. #### Shadow Deployment:
+
+Introduces the new version alongside the existing version but without routing production traffic to it.
+Allows monitoring and collecting metrics for the new version without impacting users.
+
+7. #### Feature Toggles (Feature Flags):
+
+Involves deploying new features with toggles that can be controlled dynamically.
+Enables enabling or disabling features without redeploying the application.
+
+8. #### Rolling Restarts:
+
+Periodically restarts Pods to apply changes, such as configuration updates or changes in environment variables.
+Useful for updates that do not require a full application redeployment.
+
+9. #### Helm Rollbacks:
+Utilizes Helm, a package manager for Kubernetes, to manage deployments.
+Helm allows easy rollback to a previous release or version.
+
+
+## Security Context
+It basically determines the owner of the filesystem, for security reason. 
+
+In Kubernetes, a security context is a set of settings that control the security-related attributes of a pod or container. 
+
+It allows you to configure various security parameters to enhance the security posture of your applications running in a Kubernetes cluster. 
+
+Security contexts are defined at both the pod and container levels.
+
+### 1. Pod-level security context
+
+At the pod level, you can set a security context in the spec section of the pod definition. This includes settings that apply to all containers within the pod. For example:
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000  #file system group, this is not root (0)
+  containers:
+    - name: mycontainer
+      image: nginx:latest
+```
+- runAsUser, runAsGroup: These settings specify the user and group IDs under which the container should run. This can be useful for running processes with least privilege.
+
+- fsGroup: It defines the supplemental group ID for the container. The container processes will have the specified group ID added to their supplemental group list.
+
+### 2. Container-level Security Context:
+Additionally, you can set a security context at the container level. This allows you to override or provide more specific security settings for individual containers within a pod:
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: mycontainer
+      image: nginx:latest
+      securityContext:
+        privileged: false
+        readOnlyRootFilesystem: true
+```
+- privileged: If set to true, the container is granted elevated privileges. Setting it to false (default) ensures the container runs with a restricted set of privileges.
+
+- readOnlyRootFilesystem: If set to true, the container's root filesystem is mounted as read-only. This adds an extra layer of security by preventing processes within the container from modifying the root filesystem.
+
+
+
+# Questions from Eric interview
+- cycle container
+- helm chart you can deploy
+- metric server - for autoscaling without HAS 
+- PATCHING? 
+- SONAQUE - SCAN CODE FOR APP
+- PULL SECRET POLICY
+- VOLUME VS VOLUME MOUNT?
+- SPLUNK, DATADOG (PAGERDUTY)
+- DEFAULT LOADBALANCER: "EAB load balancer"
+
+
