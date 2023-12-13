@@ -168,7 +168,81 @@ Just like in dockerhub where we have different images that are written already, 
 
 In helm, we use helm hub, where we can go pull the helmchart and use. This is like dockerhub of helm. All helmcharts, go to this website to download/pull the helmchart. [Bitnami](https://bitnami.com/stacks/containers) is a repository that has all hemlchart, and the company called VMware mantains it.
 
-With helm, you can install anything.
+With helm, you can donwload anything.
 ```
 helm fetch  --untar bitnami/wordpress
 ```
+
+### Fetching helmchart
+- Always try to use the helmchart published by the company that owns the chart. For example, if I want sonarqube helmchart, I will choose the image published by sonarsource since its the owner.
+
+- Just like dockerhub, we select the official image verified by the companies that developed them. 
+
+- Repo-1 is mantained by the US government.
+
+- artifacthub.io/ 
+
+## How do you add a helmchart to your virtual machine
+We have to download the repository where the helmchart is located. Just like in git, were we cloned repos, we use the command below to dowload the helmchart.
+```
+helm repo add [chart_name] repo_url
+```
+After running this command, and you type `ls`, we wont see anything in this repo. this is because this command simply establishes the connection between your virtual machine and the data center where the chart is located. 
+
+So dont be surprised. 
+
+### Updating the helm repo
+Just like in github, when you clone a repo and someone makes changes to the remote repo you cloned, you have to git pull to have the latest version of the repository. 
+
+In helm, you always need to have the latest version of the chart. here is how to update all repos. 
+
+```
+helm repo update
+```
+
+## Listing all helm repositories
+
+If you have many repositories, and want to list them.
+```
+helm repo list
+```
+
+### Installing a chart / application using the repos added. 
+
+```
+helm search repo sonarqube
+```
+This shows you the repositories where this chart is available. 
+You select which repo to use to install the helmchart. And use this command to install the helmchart.
+```
+helm install sonarqube sonarcubesonarcube   #this deploys sonarqube 
+#sonarcubesonarcube is the name of the repo we select. 
+```
+
+### List all applications being managed by helm in the k8s cluster
+
+We use this command to list all the applications that are currently being managed by helm in the cluster.
+```
+helm list
+```
+
+### Deleting application
+If you have deployed the helmchart for a certain application and want to delete it
+```
+helm delete 
+
+kubectl get all
+```
+### Downloading the chart to inspect before deploying
+Before installing or deploying the chart, you need download the chart ot inspect it and look at the different manifests it carries. 
+```
+helm fetch --untar sonarqube/sonarqube-Its
+```
+
+When this is downloaded, we can now deploy it after adding content to our value.yaml file. 
+
+```
+helm install s6christopher sonarqube-Its
+```
+- s6christopher will be the name of my applications
+- sonaqube-Its is the repo where my chart will be fetched from. 
