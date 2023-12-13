@@ -246,3 +246,108 @@ helm install s6christopher sonarqube-Its
 ```
 - s6christopher will be the name of my applications
 - sonaqube-Its is the repo where my chart will be fetched from. 
+
+When you cd into/ inside the helmchart, you dont need to put the name of the helmchart when you deploy, you will get an error message complaining about the path. 
+Therefore, to deploy, you put a dot, which means "here". Meaning that, the helmchart is in our current working directory.
+
+
+```
+cd sonarqube-Its
+helm install s6christopher sonarqube-Its  #this wont work since we are inside
+
+helm install s6christopher .    #this will work
+```
+
+### Create a dummy helmchart
+
+If you are told to create a helchart, you can create your own chart. 
+
+
+### Showing all manifest that will be deployed. (simulating but not install)
+```
+helm template .
+```
+
+### Difference between helm install and helm upgrade
+```
+Helm install thomisis
+
+
+helm upgrade -i thomisis
+```
+
+- Helm install will deploy the the application but helm upgrade will the application and install. 
+
+- Forexample, if in your helmchart you have 1 replicaset, and i change it it in the value file, this wont be deployed automatically. 
+- You cant helm install again because the application already exists
+-  Therefore, we do helm upgrade -i to syncronize the latest updates. Therefore always use helm upgrade i. 
+
+
+
+### specifying the value file
+```
+helm upgrade -i thomisis . -f values.yaml
+```
+
+## Helm Overwrite files
+![Alt text](<WhatsApp Image 2023-12-12 at 21.40.23_c829e2ce.jpg>)
+For example in the diagram above. We have 4 different stages of application, Development, Quality assurance, preproduction and production. We want to have different replicasets in each stage. or we also want to have a different version of the application each environment. 
+
+We dont have to create 4 different value.yaml files. We create one main value.yaml file, and create 4 different override files. In the override file, we only inlcude the parts of the value.yaml file that we want to change depending on the environment we are working with. 
+
+The rest of the content in the value.yaml will be retained in these environments but only the content in the override files will be changed. 
+
+This applies for example in asembly lines where each version of the app moves from one step to another. Development will be working on the latest version while we have the oldest version in production.
+![Alt text](<WhatsApp Image 2023-12-12 at 22.05.08_d32b2715.jpg>)
+
+Therefore each stage would need its one version difined in the override file. 
+
+#### values.yaml (Main Values)
+```
+# values.yaml
+replicaCount: 1
+appVersion: "1.0.0"
+# Other common configurations...
+
+```
+#### values.dev.yaml (Development Override)
+
+```
+# values.dev.yaml
+replicaCount: 2
+appVersion: "1.1.0"
+# Additional development-specific configurations...
+
+```
+
+#### values.qa.yaml (Quality Assurance Override)
+
+```
+# values.qa.yaml
+replicaCount: 3
+appVersion: "1.1.0"
+# Additional QA-specific configurations...
+
+```
+
+#### values.prod.yaml (Production Override)
+```
+# values.prod.yaml
+replicaCount: 5
+appVersion: "2.0.0"
+# Additional production-specific configurations...
+
+```
+
+Now, when deploying your Helm chart for each environment, you can use the appropriate override file: This way, you have a clear separation of configurations for different environments while maintaining a common set of configurations in the main values.yaml file. Adjust the values according to your specific requirements and configurations.
+```
+# For development
+helm install my-release -f values.dev.yaml ./my-chart
+
+# For quality assurance
+helm install my-release -f values.qa.yaml ./my-chart
+
+# For production
+helm install my-release -f values.prod.yaml ./my-chart
+
+```
