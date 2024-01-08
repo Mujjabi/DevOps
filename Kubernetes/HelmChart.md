@@ -235,6 +235,8 @@ kubectl get all
 ```
 ### Downloading the chart to inspect before deploying
 Before installing or deploying the chart, you need download the chart ot inspect it and look at the different manifests it carries. 
+
+This is the way to always 
 ```
 helm fetch --untar sonarqube/sonarqube-Its
 ```
@@ -269,6 +271,8 @@ helm template .
 ```
 
 ### Difference between helm install and helm upgrade
+
+ALWAYS UPGRADE BEFORE DEPLOYING  to always have the latest security patches. 
 ```
 Helm install thomisis
 
@@ -351,3 +355,26 @@ helm install my-release -f values.qa.yaml ./my-chart
 helm install my-release -f values.prod.yaml ./my-chart
 
 ```
+
+## Frontend mainifest
+
+These cant be deployed directely from bitmani, since these are not third party like database.
+You have to template these. 
+
+
+## after creating template;
+
+Run this to see what is going to be deployed. Redirect it to another file. 
+
+```
+helm install manifestname . --dry-run > file.yml
+```
+
+## Upgrading aftter templating
+
+```
+helm upgrade [appname] [directory/] --values directory/value.yaml
+
+helm upgrade espresso-cat espresso.product-cat/ --values espresso.product-cat/value.yaml
+```
+For above example, the name of the microservice is espresso-cat, which is located in the espresso.product-cat directory, and the value file for this helmchart is also located in the same directory. When u update the value.yaml file, u run that command above to automatically update the infor in the corresponding manifests. 
