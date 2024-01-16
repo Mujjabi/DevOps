@@ -367,7 +367,7 @@ You have to template these.
 Run this to see what is going to be deployed. Redirect it to another file. 
 
 ```
-helm install manifestname . --dry-run > file.yml
+helm install chartname . --dry-run > file.yml
 ```
 
 ## Upgrading aftter templating
@@ -378,3 +378,6 @@ helm upgrade [appname] [directory/] --values directory/value.yaml
 helm upgrade espresso-cat espresso.product-cat/ --values espresso.product-cat/value.yaml
 ```
 For above example, the name of the microservice is espresso-cat, which is located in the espresso.product-cat directory, and the value file for this helmchart is also located in the same directory. When u update the value.yaml file, u run that command above to automatically update the infor in the corresponding manifests. 
+
+# The Helper File.
+

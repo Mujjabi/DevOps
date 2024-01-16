@@ -1127,6 +1127,13 @@ For example, in k8s the service (exposes the pod) is placed infront of the pod i
 
 Another example, the deployment.yaml doesnt mention the service anywhere. But k8s will know which service to use for a particular deployment manifest using the match label of the app being deployed, that is mentioned in both manifests. 
 
+## Difference between label under metadata, label under selector, and label under template;
+label under metadata is for us humans to filter deployments. Normally, this is the same as the app name. 
+
+label under selector is the most important one becuause it helps kubernetes to group deployments. This label helps to create connection between manifests. Forexample, if I wnt to place a service infront of a deployment, I have to call this label in both files.
+
+label under template is the label that is placed on the pod after deployment. when u create a pod, the pod will carry this label. 
+
 ### Kyverno:
 Some companies install this program called kyverno to impede anyone to deploy anything without a label. 
 
