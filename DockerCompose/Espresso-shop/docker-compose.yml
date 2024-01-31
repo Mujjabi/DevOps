@@ -1,0 +1,95 @@
+version: '3.5'
+
+services:
+  postgresql-ha:
+    container_name: espresso-shop-db
+    image: postgresql-ha
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=database
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - Espresso-shop
+    restart: always
+
+  redis:
+    container_name: Espresso-shop-redis
+    image: redis
+    networks:
+      - Espresso-shop
+    environment:
+      - REDIS_USER=redis
+      - REDIS_PASSWORD=redis
+    restart: always
+
+  Shop-web:
+    container_name: Espresso-shop-web
+    image: devopseasylearning/espresso-shop-web:v1.0.0
+    expose:
+      - 8090:80
+    environment:
+      - ProductCatalogUrl=http://espresso-shop-product-catalog-svc:8091
+      - ReviewsUrl=http://espresso-shop-reviews-svc:8092
+      - version=v1
+    networks:
+      - Espresso-shop
+    restart: always
+    depends_on:
+      - postgresql-ha
+      - redis # Weather depends on both db and redis
+
+  shop-product:
+    container_name: Espresso-shop-product
+    image: devopseasylearning/espresso-shop-product-catalog:v1.0.0
+    environment:
+      - version=v1
+    expose:
+      - 8080:80
+    networks:
+      - Espresso-shop
+    restart: always
+    depends_on:
+      -  Shop-web # Auth depends on the weather service
+      -  postgresql-ha
+
+  shop-review1:
+    container_name: Espresso-shop-product
+    image: devopseasylearning/espresso-shop-reviews:v1.0.0
+    environment:
+      - version=v1
+      - SERVICE_VERSION = v1
+    expose:
+      - 80
+    ports:
+      - 8092:80
+    networks:
+      - Espresso-shop
+    restart: always
+    depends_on:
+      - Shop-web # UI depends on Auth container
+      - postgresql-ha
+
+  shop-review2:
+    container_name: Espresso-shop-product
+    image: devopseasylearning/espresso-shop-reviews:v1.0.0
+    environment:
+      - version=v1
+      - SERVICE_VERSION = v2
+    expose:
+      - 80
+    ports:
+      - 8092:80
+    networks:
+      - Espresso-shop
+    restart: always
+    depends_on:
+      - Shop-web # UI depends on Auth container
+      - postgresql-ha
+networks:
+  Espresso-shop:
+
+
+volumes:
+  db-data:
