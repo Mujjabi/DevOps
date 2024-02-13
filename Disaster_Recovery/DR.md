@@ -170,3 +170,27 @@ The AWS Command Line Interface (AWS CLI) is a powerful and versatile tool that a
 
 ## Backup retention
 - keep the backup for a certain period of time
+
+
+## RDS - Relational Database Service
+Amazon RDS (Relational Database Service) is a managed relational database service provided by Amazon Web Services (AWS). It allows users to set up, operate, and scale relational databases in the cloud without having to manage the underlying infrastructure. Amazon RDS supports multiple database engines, making it a versatile choice for various application requirements.
+
+1. Managed Service:
+
+Amazon RDS automates routine database tasks, such as backups, software patching, and database scaling, allowing users to focus on their applications rather than managing database infrastructure.
+
+2. Multiple Database Engines:
+
+RDS supports various relational database engines, including MySQL, PostgreSQL, MariaDB, Oracle Database, and Microsoft SQL Server. Users can choose the database engine that best fits their application needs.
+
+3. Automated Backups and Snapshots:
+
+RDS provides automated daily backups and enables users to create manual snapshots. This ensures data durability and allows users to restore databases to a specific point in time.
+
+4. High Availability and Failover:
+
+RDS supports multi-AZ (Availability Zone) deployments for high availability. In a multi-AZ setup, a standby replica is automatically created in a different availability zone, providing failover capabilities in case of hardware or availability zone failures.
+
+5. Scalability:
+
+Users can easily scale their database instances vertically (by resizing) or horizontally (by adding read replicas). This flexibility helps adapt to changing workloads and performance requirements.
