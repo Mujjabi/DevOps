@@ -893,6 +893,11 @@ groupmod -n newname mygroup   #mygroup is the current group name to be changed.
 ```
 
 ## Changing user privilege in the sudoers file 
+
+The right way to open the sudoer file is using visudo and not any text editors like vim or nano. This is because if 2 admins open this file at the same time, the file might get corrupted and it locks everyone out of the system. If u use visudo, the other admin wont be able to open it, it will tell him to try again later. 
+
+- this will shutdown the server.
+
 If you want a user to have the same privilege as the root, you can open the shadow file using the visudo and give them the same powers and the root to execute any command.  Here, I added users s6christopher and Jenkins to have the same power as the Root. 
 ```
 visudo
